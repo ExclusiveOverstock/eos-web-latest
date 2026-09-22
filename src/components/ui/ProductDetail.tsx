@@ -27,9 +27,11 @@ import type { Product } from "@/lib/shopify/types";
  * also explains why it is a slideshow rather than the vertical stack that
  * replaced the canvas first.
  *
- * The route to Prototype B is offered here rather than forced. Someone who
- * arrived from a search result wanting to know whether the L is still
- * available should not have to scroll through a seven-beat film to find out.
+ * There is no longer a link out to a 3D "lot experience". That route showed
+ * a procedurally generated garment standing in for the real product, which
+ * is the same thing this page stopped doing when the canvas came out of the
+ * image column. Keeping a prominent button to it would have pointed people
+ * at the one remaining synthesised garment on the site.
  */
 export default function ProductDetail({ product }: { product: Product }) {
   const closed = product.status === "CLOSED";
@@ -50,24 +52,6 @@ export default function ProductDetail({ product }: { product: Product }) {
             <div>
               <ProductGallery images={product.images} title={product.title} />
 
-              <Link
-                href={`/lot/${product.handle}`}
-                data-cursor="discover"
-                data-cursor-label="Enter"
-                className="group mt-4 flex items-center justify-between border border-hairline px-6 py-5 transition-colors duration-500 hover:border-hairline-strong hover:bg-charcoal"
-              >
-                <span>
-                  <span className="eos-meta-sm block text-taupe">
-                    The Lot Experience
-                  </span>
-                  <span className="eos-display-sm mt-2 block text-[1.15rem] text-bone">
-                    See it properly
-                  </span>
-                </span>
-                <span className="eos-meta-sm text-taupe transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1.5">
-                  →
-                </span>
-              </Link>
             </div>
 
             {/* --- The record ------------------------------------ */}
