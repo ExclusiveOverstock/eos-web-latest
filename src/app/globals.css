@@ -1,0 +1,450 @@
+@import "tailwindcss";
+
+/*
+  ============================================================
+  EOS — DESIGN TOKENS
+  ============================================================
+
+  Every visual constant in the project lives here. Components
+  reference tokens; they do not invent values. Three.js reads
+  the same numbers from src/lib/design/tokens.ts.
+
+  COLOUR RATIO (target)
+    ~60%  void          backgrounds, immersive space
+    ~25%  bone          typography, editorial surfaces
+    ~10%  charcoal/taupe cards, metadata, inactive states
+    ~5%   oxblood       CTAs, scarcity, selected states
+
+  ONE RULE ABOUT OXBLOOD
+    #641F2A against #0A0909 measures ~1.5:1. It is a *surface*
+    and a *mark*, never body copy on black. Oxblood appears as
+    fills, rules, indicators and CTA backgrounds — with bone
+    sitting on top of it at ~10:1. This keeps the accent scarce,
+    which is also exactly how the brand should read.
+*/
+
+@theme {
+  /* --- Core ------------------------------------------------ */
+  --color-void: #0a0909;
+  --color-charcoal: #191717;
+  --color-charcoal-2: #211e1d;
+  --color-bone: #f1e9dc;
+  --color-taupe: #9c9185;
+
+  /* --- Accent ---------------------------------------------- */
+  --color-oxblood: #641f2a;
+  --color-oxblood-deep: #3a1118;
+
+  /* Tertiary. Used almost nowhere on purpose — EOS is not a
+     black-and-gold brand. Reserved for rare foil-like details. */
+  --color-brass: #8b8065;
+
+  /* --- Structure ------------------------------------------- */
+  /* Bone laid over void at 10% and 18% — reads as a drawn line
+     on every dark surface in the system, not just on void. */
+  --color-hairline: #242120;
+  --color-hairline-strong: #38342f;
+
+  /* --- Motion ---------------------------------------------- */
+  /* Expo-out. Fast departure, long settle — the whole site's
+     sense of weight comes from this curve. */
+  --ease-eos: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-eos-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-eos-soft: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/*
+  Tailwind font tokens.
+
+  The `inline` keyword is load-bearing. It makes a utility such as
+  `font-mono` compile to the SOURCE variable — font-family:
+  var(--font-plex-mono) — rather than to var(--font-mono).
+
+  That is the only reason those utilities work here. next/font declares
+  --font-plex-mono on the (site) layout's wrapper div, which sits below
+  :root, and a custom property inherits its COMPUTED value. The aliases
+  below are resolved against :root, where --font-plex-mono does not
+  exist, so --font-mono computes to nothing and every descendant
+  faithfully inherits that nothing.
+
+  Which is why the primitives further down reference --font-bebas and
+  --font-plex-mono directly and never these aliases. Do not "tidy" them
+  back: the failure is silent, and it is the whole display voice.
+*/
+@theme inline {
+  --font-display: var(--font-bebas);
+  --font-body: var(--font-inter);
+  --font-mono: var(--font-plex-mono);
+}
+
+:root {
+  /* Durations are plain custom properties rather than theme
+     tokens: they are consumed by transition-duration in CSS and
+     by Framer Motion via getComputedStyle-free constants in
+     src/lib/design/tokens.ts, not by Tailwind utilities. */
+  --dur-fast: 240ms;
+  --dur-base: 600ms;
+  --dur-slow: 1100ms;
+  --dur-cinematic: 2200ms;
+
+  /* Header height, so full-bleed sections can subtract it. */
+  --chrome-h: 64px;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --chrome-h: 80px;
+  }
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+
+* {
+  border-color: var(--color-hairline);
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--color-void);
+  /* Light type on a near-black ground gains weight under subpixel AA and
+     the condensed display face closes up; grayscale keeps counters open. */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--color-void);
+  color: var(--color-bone);
+  /*
+    A real stack, not var(--font-body) — see the note above. The webfonts
+    are declared per layout, so this is what a route renders in before
+    (or without) one of them.
+  */
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-feature-settings: "ss01" 1, "cv05" 1;
+}
+
+::selection {
+  background: var(--color-oxblood);
+  color: var(--color-bone);
+}
+
+:focus-visible {
+  outline: 1.5px solid var(--color-bone);
+  outline-offset: 3px;
+}
+
+/* Native controls must never fall back to browser blue. */
+input,
+select,
+textarea,
+button {
+  accent-color: var(--color-oxblood);
+}
+
+/* ============================================================
+   COMPONENT PRIMITIVES
+   Layered below utilities so a one-off Tailwind class still wins.
+   ============================================================ */
+
+@layer components {
+  /*
+    Metadata voice — lot codes, eyebrows, prices, nav, buttons.
+    The tracked-out mono line is the connective tissue of the
+    whole site, so it is defined once rather than re-typed as
+    four utilities every time.
+  */
+  .eos-meta {
+    font-family: var(--font-plex-mono);
+    font-size: 0.6875rem;
+    line-height: 1.4;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .eos-meta-sm {
+    font-family: var(--font-plex-mono);
+    font-size: 0.625rem;
+    line-height: 1.4;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /*
+    Editorial display — a condensed gothic, capitals only.
+
+    Leading is tighter than it would be for a lowercase face because
+    capitals have no descenders: at 1.02 the lines of a stacked headline
+    drift apart. Tracking runs slightly POSITIVE, the opposite of the
+    Didone this replaced — condensed capitals set solid close their
+    counters up and start to read as a texture rather than as words.
+  */
+  .eos-display {
+    font-family: var(--font-bebas);
+    font-weight: 400;
+    line-height: 0.94;
+    letter-spacing: 0.012em;
+  }
+
+  /* Same face, dialled back for sub-heads and product titles. */
+  .eos-display-sm {
+    font-family: var(--font-bebas);
+    font-weight: 400;
+    line-height: 1.02;
+    /* More air the smaller it gets — the usual rule for caps. */
+    letter-spacing: 0.028em;
+  }
+
+  .eos-body {
+    font-size: 0.9375rem;
+    line-height: 1.75;
+    color: var(--color-taupe);
+  }
+
+  /* --- Buttons ------------------------------------------- */
+
+  .eos-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    border: 1px solid transparent;
+    font-family: var(--font-plex-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    transition:
+      background-color var(--dur-fast) var(--ease-eos),
+      border-color var(--dur-fast) var(--ease-eos),
+      color var(--dur-fast) var(--ease-eos);
+  }
+
+  .eos-btn-primary {
+    background: var(--color-oxblood);
+    border-color: var(--color-oxblood);
+    color: var(--color-bone);
+  }
+
+  .eos-btn-primary:hover:not(:disabled) {
+    background: var(--color-oxblood-deep);
+    border-color: var(--color-oxblood-deep);
+  }
+
+  .eos-btn-primary:active:not(:disabled) {
+    background: var(--color-oxblood-deep);
+  }
+
+  .eos-btn-secondary {
+    background: transparent;
+    border-color: var(--color-bone);
+    color: var(--color-bone);
+  }
+
+  .eos-btn-secondary:hover:not(:disabled) {
+    background: var(--color-bone);
+    color: var(--color-void);
+  }
+
+  .eos-btn-quiet {
+    background: transparent;
+    border-color: var(--color-hairline-strong);
+    color: var(--color-bone);
+  }
+
+  .eos-btn-quiet:hover:not(:disabled) {
+    border-color: var(--color-bone);
+  }
+
+  .eos-btn:disabled {
+    background: transparent;
+    border-color: var(--color-hairline);
+    color: var(--color-hairline-strong);
+    cursor: not-allowed;
+  }
+}
+
+/* ============================================================
+   ATMOSPHERE
+   ============================================================ */
+
+/*
+  Film grain. A single 160px tile of fractal noise, tiled and
+  held at very low opacity — enough to stop large black fields
+  from banding on cheap panels and to give flat colour a
+  photographic surface. Always pointer-events-none, always
+  behind content.
+*/
+.eos-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* Cinematic falloff at the frame edges for immersive sections. */
+.eos-vignette::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 50% 45%,
+    transparent 38%,
+    rgba(10, 9, 9, 0.38) 76%,
+    rgba(10, 9, 9, 0.78) 100%
+  );
+}
+
+/* ============================================================
+   MOTION KEYFRAMES
+   ============================================================ */
+
+@keyframes eos-manifest-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.manifest-track {
+  animation: eos-manifest-scroll 64s linear infinite;
+}
+
+@keyframes eos-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes eos-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/*
+  The loading curtain's mark and rule.
+
+  Both are CSS rather than JS animations on purpose. They run before and
+  during the heaviest work the site does — building geometry, compiling
+  shaders, warming a WebGL context — and a compositor-driven animation keeps
+  moving through a blocked main thread where a JS-driven one stutters
+  exactly when the visitor is most likely to be watching it.
+*/
+@keyframes eos-mark-settle {
+  from {
+    opacity: 0;
+    letter-spacing: 0.72em;
+  }
+  to {
+    opacity: 1;
+    letter-spacing: 0.42em;
+  }
+}
+
+.eos-mark-settle {
+  animation: eos-mark-settle 1.8s var(--ease-eos) both;
+}
+
+@keyframes eos-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+
+.eos-sweep {
+  animation: eos-sweep 1.6s ease-in-out infinite;
+}
+
+/* The scroll cue's slow travel — deliberately long and quiet. */
+@keyframes eos-drift {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 1;
+  }
+}
+
+.eos-drift {
+  animation: eos-drift 3.2s var(--ease-eos-inout) infinite;
+}
+
+/* ============================================================
+   REDUCED MOTION
+   Calmer, not broken: transitions collapse, looping ambience
+   stops, but nothing that carries meaning disappears.
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .manifest-track,
+  .eos-drift,
+  .eos-sweep {
+    animation: none !important;
+  }
+
+  /* The mark still needs to arrive, just without travelling to get there. */
+  .eos-mark-settle {
+    animation: none !important;
+    opacity: 1;
+    letter-spacing: 0.42em;
+  }
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-hairline-strong) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--color-hairline-strong);
+  border: 3px solid var(--color-void);
+}

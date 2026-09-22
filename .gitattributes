@@ -1,0 +1,18 @@
+# Normalise line endings.
+#
+# Windows checkouts use CRLF locally; the repository and the Linux build
+# machine see LF. Without this, the first commit made on a different OS
+# rewrites every line of every file and the diff becomes unreadable. This
+# project has already hit CRLF-vs-LF trouble once in its source files.
+* text=auto eol=lf
+
+# Binary assets — never touched, never diffed as text.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.webp binary
+*.gif  binary
+*.mp4  binary
+*.glb  binary
+*.woff  binary
+*.woff2 binary
