@@ -10,11 +10,12 @@ import "./globals.css";
  * the root meant any new experience added to the app inherited site A's
  * furniture whether or not it wanted it.
  *
- * That is precisely what Prototype B must not do: it is a separate visual
- * world with its own typography, its own chrome and its own stylesheet, and
- * it renders under `(prototype-b)/layout.tsx` instead. Route groups do not
- * appear in URLs, so this reorganisation moved no page: /shop, /virtual-store
- * and the rest resolve exactly as before.
+ * The reorganisation moved no page: route groups do not appear in URLs, so
+ * /shop, /virtual-store and the rest resolve exactly as before. It was
+ * originally done to let a second experience — Prototype B — live alongside
+ * the storefront without inheriting its furniture. That prototype has since
+ * been removed, but the separation is worth keeping: this file should stay
+ * the document shell and nothing else.
  */
 
 export const metadata: Metadata = {
