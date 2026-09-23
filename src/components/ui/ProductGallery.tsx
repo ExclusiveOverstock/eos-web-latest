@@ -15,12 +15,18 @@ import type { ProductImage } from "@/lib/shopify/types";
  *
  * TWO DECISIONS WORTH KEEPING.
  *
- * `object-contain`, not `cover`. EOS's photography is mixed: the hero is a
- * 6000x4000 flat lay and the second frame is usually a 4000x6000 detail. Any
- * fixed frame has to crop one orientation or the other, and on a product page
- * — the one screen where someone is deciding whether to buy — cropping the
- * garment is the wrong trade. Contained on a void background, the letterbox
- * is invisible, because the background it letterboxes against is the page.
+ * `object-contain`, not `cover`. The photography is not uniform — ratios run
+ * from 0.454 to 1.524 — so any fixed frame cropping to fill would cut some
+ * garments badly, and on a product page, the one screen where someone is
+ * deciding whether to buy, cropping the garment is the wrong trade.
+ * Contained on a void background, the letterbox is invisible, because the
+ * background it letterboxes against is the page.
+ *
+ * The frame is 3:4, the same as the product cards. It was 4:3 while the
+ * catalog led with landscape flat lays. Once it was reshot as full-body
+ * portraits the mismatch was severe: a 0.74 photograph in a 1.333 frame
+ * occupied 56% of the width and left the other 44% as empty bars, which made
+ * the garment look small on the page that has to sell it.
  *
  * A fixed frame, not per-image ratios. The slide changes under the cursor, so
  * a frame that resized per photograph would shift the thumbnails and the buy
@@ -72,7 +78,7 @@ export default function ProductGallery({
         tabIndex={count > 1 ? 0 : -1}
         role={count > 1 ? "group" : undefined}
         aria-label={count > 1 ? `${title} — image ${index + 1} of ${count}` : undefined}
-        className="group relative aspect-[4/3] w-full overflow-hidden border border-hairline bg-void outline-none focus-visible:border-hairline-strong"
+        className="group relative aspect-[3/4] w-full overflow-hidden border border-hairline bg-void outline-none focus-visible:border-hairline-strong"
       >
         {/*
           Every frame is mounted and cross-faded rather than swapping one
