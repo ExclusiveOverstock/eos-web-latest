@@ -53,19 +53,23 @@ export default function ProductCard({ product }: { product: Product }) {
     >
       <div
         /*
-          3:2, because that is exactly what the hero photography is.
-          
-          This well was 3:4 — a tall portrait frame holding a landscape
-          photograph. `object-cover` matched the image by height and threw
-          away half its width, a 2x centre-crop that cut the sleeves off every
-          flat lay and made the garments read as enormous. Matching the frame
-          to the file crops nothing.
+          3:4, matching the photography as it now stands.
 
-          Five products are shot portrait-only and still crop here. That is a
-          photography gap rather than a layout one: a single frame has to pick
-          an orientation, and it should be the one 21 of 26 products use.
+          This frame has been wrong twice, in opposite directions, and the
+          reason both times was the same: it has to match whatever shape the
+          store's first image actually is.
+
+          It began as 3:4 by assumption, which cropped the landscape flat lays
+          then in the catalog by half. It was corrected to 3:2 to match them.
+          The catalog was then reshot as full-body portraits — 57 of 58
+          products now lead with one — and 3:2 cut the model's head and legs
+          off. It is 3:4 again, this time by measurement: the new frames
+          cluster at a 0.74 ratio, and 3:4 is 0.75.
+
+          If the grid ever starts cutting garments again, check the first
+          image's orientation in Shopify before touching anything here.
         */
-        className={`eos-grain relative aspect-[3/2] overflow-hidden bg-gradient-to-b ${image?.tone ?? ""}`}
+        className={`eos-grain relative aspect-[3/4] overflow-hidden bg-gradient-to-b ${image?.tone ?? ""}`}
       >
         {primary?.url && (
           <>
@@ -81,7 +85,7 @@ export default function ProductCard({ product }: { product: Product }) {
               fill
               loader={shopifyImageLoader}
               sizes="(min-width: 640px) 25vw, 50vw"
-              className={`object-cover transition-opacity duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              className={`object-contain transition-opacity duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                 hovered && alternate !== primary ? "opacity-0" : "opacity-100"
               }`}
             />
@@ -92,7 +96,7 @@ export default function ProductCard({ product }: { product: Product }) {
                 fill
                 loader={shopifyImageLoader}
                 sizes="(min-width: 640px) 25vw, 50vw"
-                className={`object-cover transition-opacity duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                className={`object-contain transition-opacity duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                   hovered ? "opacity-100" : "opacity-0"
                 }`}
               />
