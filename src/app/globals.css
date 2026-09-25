@@ -327,8 +327,21 @@ button {
   }
 }
 
+/*
+  The ticker's duration scales with its contents, it is not a fixed number.
+
+  It was 64s flat, which was calm at eleven lots and frantic at fifty-nine:
+  the track translates half its own width, so a catalogue five times longer
+  covers five times the distance in the same time — about 277px/s, fast
+  enough to be unreadable. The component sets --manifest-duration from the
+  number of entries, which holds the speed at roughly 60px/s whatever the
+  catalogue does next.
+
+  The fallback matters: if the variable is ever missing the ticker should be
+  slow rather than a blur.
+*/
 .manifest-track {
-  animation: eos-manifest-scroll 64s linear infinite;
+  animation: eos-manifest-scroll var(--manifest-duration, 240s) linear infinite;
 }
 
 @keyframes eos-fade-up {

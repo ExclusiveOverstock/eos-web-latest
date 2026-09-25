@@ -54,7 +54,25 @@ export default async function ManifestStrip() {
       className="overflow-hidden border-y border-hairline bg-charcoal py-4"
     >
       {/* Two identical halves, translated -50% — the seam lands off-screen. */}
-      <div className="manifest-track flex w-max">
+      <div
+        className="manifest-track flex w-max"
+        /*
+          Seven seconds per lot holds the strip at roughly 65px/s, which is
+          slow enough to read a lot code as it passes. Measured, not guessed:
+          each entry renders about 460px wide, so the constant here is what
+          converts "one lot" into "enough time to read it".
+
+          A fixed duration cannot do this. The track grows with the
+          catalogue, so the same number of seconds means a faster strip every
+          time a product is added — at 64s flat and 59 lots it was running at
+          427px/s, which is a blur.
+        */
+        style={
+          {
+            "--manifest-duration": `${entries.length * 7}s`,
+          } as React.CSSProperties
+        }
+      >
         {[0, 1].map((copy) => (
           <div key={copy} className="flex shrink-0">
             {entries.map((product) => (
