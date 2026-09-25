@@ -109,17 +109,6 @@ export default function ProductCard({ product }: { product: Product }) {
           </>
         )}
 
-        {/*
-          A single hairline frame inset from the edge. It is the one piece of
-          decoration on the card and it does real work: it gives the well an
-          intentional boundary, so a bare tone plate reads as a plate rather
-          than as a missing image.
-        */}
-        <span
-          aria-hidden="true"
-          className="absolute inset-2 border border-hairline transition-colors duration-700 group-hover:border-hairline-strong lg:inset-4"
-        />
-
         <span className="eos-meta-sm absolute left-4 top-4 text-taupe lg:left-7 lg:top-7">
           {product.lotCode}
         </span>
