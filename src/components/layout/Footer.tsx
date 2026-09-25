@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { STORE } from "@/lib/site/store";
 
 const YEAR = new Date().getFullYear();
 
@@ -6,32 +7,6 @@ const YEAR = new Date().getFullYear();
 const INSTAGRAM_HANDLE = "exclusive_overstock";
 const INSTAGRAM_URL = `https://www.instagram.com/${INSTAGRAM_HANDLE}/`;
 
-/**
- * The physical store.
- *
- * Taken from the business's own Google listing rather than typed from
- * memory, because someone will eventually drive to it. Google formats the
- * first line oddly — it returns "Block, 40, E Islam Park St" — so it is set
- * out here the way it would be read aloud.
- *
- * `hours` is deliberately unset. The listing showed an 11am open and a 10pm
- * close but not which days those apply to, and publishing opening times that
- * are right five days a week and wrong two is worse than publishing none:
- * the failure lands on a customer standing outside a shut door.
- */
-const STORE: { lines: string[]; mapsUrl?: string; hours?: string } | null = {
-  lines: ["40 E Islam Park Street", "Lahore 54000", "Pakistan"],
-  mapsUrl: "https://share.google/WQsr4aJdyljyW3lvH",
-};
-
-/**
- * `href` is optional: an entry without one renders as plain text.
- *
- * That is how the boutique is listed. Prototype A still exists and still
- * runs at /virtual-store — it is not deleted and not broken — but nothing on
- * the site links to it any more, so the footer names it without offering a
- * way in. A link to an unfinished room is a worse promise than none.
- */
 const COLUMNS: {
   heading: string;
   links: { href?: string; label: string; note?: string }[];
