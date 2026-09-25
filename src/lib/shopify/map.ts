@@ -81,8 +81,27 @@ function lotCodeFor(product: GqlProduct, variants: ProductVariant[]): string {
   const declared = metafield(product.metafields, METAFIELDS.lotCode);
   if (declared) return declared;
 
+  /**
+   * A SKU is only a lot code when it is shaped like one.
+   *
+   * This used to accept any SKU beginning "EOS-" and take its first two
+   * dash-separated segments. That was written for codes like EOS-014-7. The
+   * store's SKUs are descriptive instead — EOS-SW-HEATHER-GREY-EMBELLISHED-S
+   * — where the first two segments are the *category*, so 58 products
+   * collapsed onto three codes: EOS-SW appeared on 28 of them, EOS-BT on 17,
+   * EOS-HD on 13. A lot code that is not unique is worse than no lot code,
+   * because the whole manifest conceit is that it identifies one lot.
+   *
+   * So the SKU is used only when it is EOS- followed by digits, which is a
+   * deliberate identifier rather than a naming convention. Anything else
+   * falls through to the derived code below.
+   */
   const sku = variants.find((v) => v.sku)?.sku;
-  if (sku && /^EOS-/i.test(sku)) return sku.split(/[-_ ]/).slice(0, 2).join("-").toUpperCase();
+  const codeLike = sku?.match(/^EOS-(\d{1,4})(?:[-_.](\d{1,2}))?/i);
+  if (codeLike) {
+    const [, digits, suffix] = codeLike;
+    return `EOS-${digits.padStart(3, "0")}${suffix ? `.${suffix}` : ""}`;
+  }
 
   const n = hash(product.handle) % 1000;
   const suffix = hash(product.handle + "s") % 10;

@@ -143,6 +143,21 @@ export default function ManifestBrowser({
           {filtered.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
+          {/*
+            Fills out the last row.
+
+            The grid draws its separators by painting the container hairline
+            and letting a 1px gap show through. That works for every complete
+            row and fails on the last one: where there are no cards, there is
+            nothing painting over the container, so the leftover cells render
+            as a solid grey block.
+
+            Padding to a multiple of four closes it. Four also covers the
+            two-column breakpoint, since any multiple of four is even.
+          */}
+          {Array.from({ length: (4 - (filtered.length % 4)) % 4 }).map((_, i) => (
+            <div key={`filler-${i}`} aria-hidden="true" className="bg-void" />
+          ))}
         </div>
       )}
     </>
