@@ -80,21 +80,20 @@ export default function HeroVideo({ className = "" }: { className?: string }) {
      * press play to see the shop. A browser that refuses autoplay will allow
      * play() once the user has interacted, so any sign of life starts it.
      *
-     * WHY THIS IS CONDITIONAL. Low Power Mode and data saver block autoplay
-     * deliberately, to spend less battery and less data. Forcing playback on
-     * the first scroll would technically work and would be the wrong thing:
-     * it overrides a choice the visitor made about their own device, to play
-     * a decorative film they did not ask for. A looping 15-second video is
-     * exactly the cost those modes exist to avoid.
+     * This runs unconditionally, by instruction. Low Power Mode and data
+     * saver also block autoplay, and playing anyway overrides a choice the
+     * visitor made about their own device — that was weighed and decided
+     * against: the film is the hero, and a visitor should see it.
      *
-     * So when the device signals it is conserving, the poster simply stays.
-     * That is a complete hero — the film's own opening frame — so respecting
-     * the setting costs the visitor nothing.
+     * There is no poster. Without one the element is transparent over
+     * bg-void while the file loads, and shows the first decoded frame once
+     * it arrives — so a paused video is a still of itself rather than a
+     * blank. The gap before that is black, which is the opening beat anyway.
+     *
+     * prefers-reduced-motion is still honoured above, and deliberately: that
+     * is an accessibility setting about motion sickness, not a preference
+     * about battery.
      */
-    type Saver = { saveData?: boolean };
-    const conn = (navigator as Navigator & { connection?: Saver }).connection;
-    if (conn?.saveData) return;
-
     const EVENTS = ["pointerdown", "keydown", "touchstart", "wheel", "scroll"] as const;
 
     const onFirstInteraction = () => {
@@ -114,28 +113,6 @@ export default function HeroVideo({ className = "" }: { className?: string }) {
         passive: true,
       });
     }
-
-    /**
-     * Battery, checked after the fact because the API is async.
-     *
-     * Chrome and Edge expose it; Safari and Firefox removed it, which is why
-     * this is an enhancement rather than a gate — iOS enforces Low Power
-     * Mode itself by refusing playback, and with the listeners detached here
-     * we simply stop asking. Low and not charging means back off.
-     */
-    type BatteryLike = { charging: boolean; level: number };
-    const withBattery = (
-      navigator as Navigator & { getBattery?: () => Promise<BatteryLike> }
-    ).getBattery?.();
-
-    void withBattery
-      ?.then((battery) => {
-        if (!battery.charging && battery.level <= 0.2) {
-          detach();
-          el.pause();
-        }
-      })
-      .catch(() => {});
 
     /**
      * Also stops the film when it is off screen.
@@ -167,30 +144,15 @@ export default function HeroVideo({ className = "" }: { className?: string }) {
       <video
         ref={ref}
         src="/video/hero.mp4"
-        /**
-         * A poster, reversing an earlier decision.
-         *
-         * This deliberately had none: the element sat transparent over
-         * `bg-void` until the first frame decoded, which matched the opening
-         * beat — black, then the piece.
-         *
-         * That reasoning only held while the film was guaranteed to play. It
-         * is not. A browser refuses muted autoplay under battery saver, data
-         * saver, or an explicit user setting, and when it does the hero is a
-         * black rectangle with the browser's own play glyph on it — the
-         * worst possible first impression, and nothing the site can override.
-         *
-         * With a poster the same visitor gets the frame as a still image and
-         * the page reads as designed whether or not the video ever runs.
-         * Drawn from the film itself at 1.4s, 1200x675, 67KB.
-         */
-        poster="/video/hero-poster.jpg"
         muted
         loop
         playsInline
         autoPlay={!calm}
-        // The file is under 2MB and it is the first thing anyone sees, so it
-        // is worth the connection. `metadata` would hold the first frame back.
+        // It is the first thing anyone sees, so it is worth the connection —
+        // `metadata` would hold the first frame back. The file is 5.3MB,
+        // which is heavy for a hero and is the main reason a browser on a
+        // slow link may give up on it; re-encoding it smaller is the single
+        // most useful thing that could be done to this component.
         preload="auto"
         disablePictureInPicture
         // Decorative: the film carries no information the copy does not, and
