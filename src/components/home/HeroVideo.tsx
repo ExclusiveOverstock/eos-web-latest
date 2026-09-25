@@ -70,24 +70,31 @@ export default function HeroVideo({ className = "" }: { className?: string }) {
     el.addEventListener("canplay", attempt);
 
     /**
-     * Start on the visitor's first interaction, if autoplay was refused.
+     * Start on the visitor's first interaction, if autoplay was refused —
+     * unless the device has asked us not to.
      *
-     * Muted autoplay is permitted by default in Chrome and Firefox, but not
-     * universally: Edge's "Media autoplay: Limit" blocks it, as do battery
-     * saver, data saver and per-site overrides. When that happens the
-     * browser paints its own play control over the frame, and a visitor
-     * should never have to press play to see the shop.
+     * Muted autoplay is permitted by default in Chrome and Firefox but not
+     * universally: Edge's "Media autoplay: Limit" blocks it, as do data
+     * saver and per-site overrides. When it is refused the browser paints
+     * its own play control over the frame, and a visitor should not have to
+     * press play to see the shop. A browser that refuses autoplay will allow
+     * play() once the user has interacted, so any sign of life starts it.
      *
-     * A browser that refuses autoplay will allow play() once the user has
-     * interacted with the page, so these listeners wait for any sign of
-     * life — a scroll, a click, a key, a touch — and start the film then.
-     * Nearly everyone scrolls within a second or two, so in practice the
-     * film starts on its own and the poster is a brief still rather than a
-     * dead end.
+     * WHY THIS IS CONDITIONAL. Low Power Mode and data saver block autoplay
+     * deliberately, to spend less battery and less data. Forcing playback on
+     * the first scroll would technically work and would be the wrong thing:
+     * it overrides a choice the visitor made about their own device, to play
+     * a decorative film they did not ask for. A looping 15-second video is
+     * exactly the cost those modes exist to avoid.
      *
-     * They fire once and detach, and they are passive so they never delay
-     * the scroll that triggered them.
+     * So when the device signals it is conserving, the poster simply stays.
+     * That is a complete hero — the film's own opening frame — so respecting
+     * the setting costs the visitor nothing.
      */
+    type Saver = { saveData?: boolean };
+    const conn = (navigator as Navigator & { connection?: Saver }).connection;
+    if (conn?.saveData) return;
+
     const EVENTS = ["pointerdown", "keydown", "touchstart", "wheel", "scroll"] as const;
 
     const onFirstInteraction = () => {
@@ -107,6 +114,28 @@ export default function HeroVideo({ className = "" }: { className?: string }) {
         passive: true,
       });
     }
+
+    /**
+     * Battery, checked after the fact because the API is async.
+     *
+     * Chrome and Edge expose it; Safari and Firefox removed it, which is why
+     * this is an enhancement rather than a gate — iOS enforces Low Power
+     * Mode itself by refusing playback, and with the listeners detached here
+     * we simply stop asking. Low and not charging means back off.
+     */
+    type BatteryLike = { charging: boolean; level: number };
+    const withBattery = (
+      navigator as Navigator & { getBattery?: () => Promise<BatteryLike> }
+    ).getBattery?.();
+
+    void withBattery
+      ?.then((battery) => {
+        if (!battery.charging && battery.level <= 0.2) {
+          detach();
+          el.pause();
+        }
+      })
+      .catch(() => {});
 
     /**
      * Also stops the film when it is off screen.
