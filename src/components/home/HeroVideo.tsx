@@ -148,11 +148,21 @@ export default function HeroVideo({ className = "" }: { className?: string }) {
         loop
         playsInline
         autoPlay={!calm}
-        // It is the first thing anyone sees, so it is worth the connection —
-        // `metadata` would hold the first frame back. The file is 5.3MB,
-        // which is heavy for a hero and is the main reason a browser on a
-        // slow link may give up on it; re-encoding it smaller is the single
-        // most useful thing that could be done to this component.
+        /*
+          `auto` because this is the first thing anyone sees and the file is
+          now small enough to justify it — `metadata` would hold the first
+          frame back for no good reason.
+
+          It was not always small enough. The source was 5.3MB, six times the
+          weight of all the HTML and JavaScript on the page combined, and
+          `auto` meant the browser fetched every byte of it up front in
+          competition with everything else. On a phone that read as the page
+          lagging and the film never arriving. Re-encoded at 1280x720, CRF 30,
+          audio stripped: 1.08MB, a 79% cut with no visible loss.
+
+          If this file is ever replaced, keep it near a megabyte. The weight
+          is the thing that breaks the hero, not the code around it.
+        */
         preload="auto"
         disablePictureInPicture
         // Decorative: the film carries no information the copy does not, and
