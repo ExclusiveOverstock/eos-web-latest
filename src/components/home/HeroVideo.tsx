@@ -70,6 +70,45 @@ export default function HeroVideo({ className = "" }: { className?: string }) {
     el.addEventListener("canplay", attempt);
 
     /**
+     * Start on the visitor's first interaction, if autoplay was refused.
+     *
+     * Muted autoplay is permitted by default in Chrome and Firefox, but not
+     * universally: Edge's "Media autoplay: Limit" blocks it, as do battery
+     * saver, data saver and per-site overrides. When that happens the
+     * browser paints its own play control over the frame, and a visitor
+     * should never have to press play to see the shop.
+     *
+     * A browser that refuses autoplay will allow play() once the user has
+     * interacted with the page, so these listeners wait for any sign of
+     * life — a scroll, a click, a key, a touch — and start the film then.
+     * Nearly everyone scrolls within a second or two, so in practice the
+     * film starts on its own and the poster is a brief still rather than a
+     * dead end.
+     *
+     * They fire once and detach, and they are passive so they never delay
+     * the scroll that triggered them.
+     */
+    const EVENTS = ["pointerdown", "keydown", "touchstart", "wheel", "scroll"] as const;
+
+    const onFirstInteraction = () => {
+      detach();
+      attempt();
+    };
+
+    function detach() {
+      for (const type of EVENTS) {
+        window.removeEventListener(type, onFirstInteraction);
+      }
+    }
+
+    for (const type of EVENTS) {
+      window.addEventListener(type, onFirstInteraction, {
+        once: true,
+        passive: true,
+      });
+    }
+
+    /**
      * Also stops the film when it is off screen.
      *
      * The hero is one screen of a long page. Decoding 15 seconds of video on
@@ -90,6 +129,7 @@ export default function HeroVideo({ className = "" }: { className?: string }) {
     return () => {
       el.removeEventListener("canplay", attempt);
       visibility.disconnect();
+      detach();
     };
   }, [calm]);
 
