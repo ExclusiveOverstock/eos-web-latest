@@ -181,11 +181,7 @@ export default function CartPage() {
             >
               {error}
             </p>
-          ) : (
-            <p className="eos-meta-sm max-w-sm text-right text-taupe">
-              Payment and delivery are handled by Shopify.
-            </p>
-          )}
+          ) : null}
         </div>
       </div>
     </section>
