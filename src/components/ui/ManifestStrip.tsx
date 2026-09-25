@@ -1,4 +1,3 @@
-import { pad2 } from "@/lib/shopify/format";
 import { getManifest } from "@/lib/shopify/catalog";
 
 /**
@@ -15,13 +14,10 @@ import { getManifest } from "@/lib/shopify/catalog";
 function Entry({
   lot,
   item,
-  qty,
   closed,
 }: {
   lot: string;
   item: string;
-  /** Null when the count is unknown — see LotStatus. */
-  qty: number | null;
   closed: boolean;
 }) {
   return (
@@ -34,10 +30,8 @@ function Entry({
           <span aria-hidden="true" className="h-1 w-1 bg-oxblood" />
           Lot Closed
         </span>
-      ) : qty === null ? (
-        <span className="text-bone">Available</span>
       ) : (
-        <span className="tabular-nums text-bone">{pad2(qty)} Remaining</span>
+        <span className="text-bone">Available</span>
       )}
       <span className="ml-4 text-hairline-strong">/</span>
     </div>
@@ -68,7 +62,6 @@ export default async function ManifestStrip() {
                 key={`${copy}-${product.id}`}
                 lot={product.lotCode}
                 item={product.title.split("—")[0].trim().toUpperCase()}
-                qty={product.quantityRemaining}
                 closed={product.status === "CLOSED"}
               />
             ))}

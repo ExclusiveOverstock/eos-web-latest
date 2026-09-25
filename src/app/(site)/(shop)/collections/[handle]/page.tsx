@@ -36,10 +36,6 @@ export default async function CollectionPage({
   if (!collection) notFound();
 
   const products = await getProductsByCollection(handle);
-  const known = products.every((p) => p.quantityRemaining !== null);
-  const remaining = known
-    ? products.reduce((sum, p) => sum + (p.quantityRemaining ?? 0), 0)
-    : null;
   const closed = collection.status === "CLOSED";
 
   return (
@@ -77,20 +73,19 @@ export default async function CollectionPage({
               </>
             ) : (
               <>
+                {/*
+                  Lots, not pieces. The piece count that stood here was
+                  removed with every other stock figure on the site; how many
+                  lots a collection holds is a fact about the catalogue
+                  rather than about inventory.
+                */}
                 <p className="flex items-baseline gap-4">
-                  {remaining === null ? (
-                    <span className="eos-meta text-bone">Available</span>
-                  ) : (
-                    <>
-                      <span className="eos-display text-[3rem] leading-none text-bone tabular-nums sm:text-[4rem]">
-                        {pad2(remaining)}
-                      </span>
-                      <span className="eos-meta text-taupe">Pieces Remaining</span>
-                    </>
-                  )}
-                </p>
-                <p className="eos-meta-sm mt-4 text-taupe">
-                  Across {pad2(products.length)} lots
+                  <span className="eos-display text-[3rem] leading-none text-bone tabular-nums sm:text-[4rem]">
+                    {pad2(products.length)}
+                  </span>
+                  <span className="eos-meta text-taupe">
+                    {products.length === 1 ? "Lot" : "Lots"}
+                  </span>
                 </p>
               </>
             )}

@@ -149,32 +149,12 @@ export function mapProduct(product: GqlProduct): Product {
     price: v.price,
     availableForSale: v.availableForSale,
     // Null means Shopify would not tell us — see the note in queries.ts.
-    quantityAvailable: v.quantityAvailable ?? 0,
     selectedOptions: v.selectedOptions,
   }));
 
   const status: ProductStatus = variants.some((v) => v.availableForSale)
     ? "OPEN"
     : "CLOSED";
-
-  /**
-   * Remaining count, or null when Shopify withheld it.
-   *
-   * Null is not zero and must not be rendered as a number. Without the
-   * inventory scope every variant returns null, and printing "00 REMAINING"
-   * for a lot that is actually in stock would be worse than printing
-   * nothing — so the UI says "Available" instead and the count is simply
-   * absent until the scope is granted.
-   */
-  const tracked = nodes(product.variants).filter(
-    (v) => typeof v.quantityAvailable === "number",
-  );
-  const quantityRemaining =
-    tracked.length === 0
-      ? status === "CLOSED"
-        ? 0
-        : null
-      : tracked.reduce((sum, v) => sum + (v.quantityAvailable ?? 0), 0);
 
   const images = nodes(product.images);
   const tone = toneFor(product.handle);
@@ -186,7 +166,6 @@ export function mapProduct(product: GqlProduct): Product {
     description: product.description,
     lotCode: lotCodeFor(product, variants),
     status,
-    quantityRemaining,
     collectionHandles: nodes(product.collections).map((c) => c.handle),
     garmentAsset: garmentAssetFrom(product),
     lotTotal: lotTotalFor(product),

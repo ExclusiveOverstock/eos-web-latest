@@ -1,45 +1,36 @@
-import { pad2 } from "@/lib/shopify/format";
 import type { ProductStatus } from "@/lib/shopify/types";
 
 /**
- * Scarcity, in the EOS voice.
+ * Whether a lot is open, in the EOS voice.
  *
- * Inventory is part of the brand here, so it gets typography rather than a
- * badge. No "LOW STOCK!" pill, no countdown, no colour-coded alarm — the
- * count is stated plainly and the fact that it will not come back is stated
- * once, quietly, underneath. That reads as true; urgency chrome reads as
- * marketing, which is the opposite of what scarcity should feel like on a
- * site built around limited existing inventory.
+ * NO COUNTS. This component used to print the number of pieces left — "05
+ * Remaining", with a scarcity dot under three. That was removed by
+ * instruction: the site no longer tells anyone how much stock exists.
  *
- * Oxblood appears only as a mark: a dot when the lot is nearly gone, a
- * filled ground when it has closed. It is never the text colour on black —
- * see the note in globals.css.
+ * What survives is the part that was never a number. A lot is open or it is
+ * closed, and a closed lot says it will not return, which remains true and
+ * is the whole argument. Scarcity is now a property of the model rather than
+ * a figure on the page.
  *
- * THREE STATES, NOT TWO. A quantity of `null` means Shopify would not tell
- * us the count — inventory tracking off, or the app missing the inventory
- * scope. That is not the same as zero, and it must never render as one:
- * "00 REMAINING" over a lot that is actually in stock is the single most
- * damaging thing this component could say. It shows availability instead
- * and omits the number entirely.
+ * Inventory still drives this. `status` is derived from live Shopify
+ * availability, so selling the last piece still closes the lot with nobody
+ * touching anything — the count is simply no longer shown.
+ *
+ * Oxblood appears only as a mark: a dot beside a closed row, a filled ground
+ * on the product page. It is never the text colour on black — see the note
+ * in globals.css.
  */
-
-const SCARCE_AT = 3;
-
 export default function LotStatus({
   status,
-  quantity,
   size = "sm",
   className = "",
 }: {
   status: ProductStatus;
-  /** Pieces left, or null when the count is unknown. */
-  quantity: number | null;
-  /** `sm` for cards and rows, `lg` for product and experience pages. */
+  /** `sm` for cards and rows, `lg` for the product page. */
   size?: "sm" | "lg";
   className?: string;
 }) {
-  const closed = status === "CLOSED" || quantity === 0;
-  const unknown = quantity === null;
+  const closed = status === "CLOSED";
 
   if (closed) {
     return size === "lg" ? (
@@ -47,9 +38,7 @@ export default function LotStatus({
         <span className="eos-meta inline-block bg-oxblood px-3 py-1.5 text-bone">
           Lot Closed
         </span>
-        <p className="eos-meta-sm mt-3 text-taupe">
-          This piece will not return.
-        </p>
+        <p className="eos-meta-sm mt-3 text-taupe">This piece will not return.</p>
       </div>
     ) : (
       <span
@@ -61,45 +50,14 @@ export default function LotStatus({
     );
   }
 
-  // Open, but the count is not available. Say only what is known.
-  if (unknown) {
-    return size === "lg" ? (
-      <div className={className}>
-        <span className="eos-meta text-bone">Available</span>
-        <p className="eos-meta-sm mt-3 text-taupe">
-          Limited to the pieces that exist.
-        </p>
-      </div>
-    ) : (
-      <span className={`eos-meta-sm text-bone ${className}`}>Available</span>
-    );
-  }
-
-  if (size === "lg") {
-    return (
-      <div className={`flex items-baseline gap-3 ${className}`}>
-        <span className="eos-display-sm text-[2.75rem] leading-none text-bone tabular-nums">
-          {pad2(quantity)}
-        </span>
-        <span className="eos-meta text-taupe">Remaining</span>
-        {quantity <= SCARCE_AT && (
-          <span
-            aria-hidden="true"
-            className="mb-1 h-1.5 w-1.5 self-end bg-oxblood"
-          />
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <span
-      className={`eos-meta-sm inline-flex items-center gap-2 text-bone ${className}`}
-    >
-      {quantity <= SCARCE_AT && (
-        <span aria-hidden="true" className="h-1 w-1 bg-oxblood" />
-      )}
-      {pad2(quantity)} Remaining
-    </span>
+  return size === "lg" ? (
+    <div className={className}>
+      <span className="eos-meta text-bone">Available</span>
+      <p className="eos-meta-sm mt-3 text-taupe">
+        Limited to the pieces that exist.
+      </p>
+    </div>
+  ) : (
+    <span className={`eos-meta-sm text-bone ${className}`}>Available</span>
   );
 }

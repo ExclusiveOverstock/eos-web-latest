@@ -56,7 +56,6 @@ const PRODUCT_FIELDS = /* GraphQL */ `
           title
           sku
           availableForSale
-          quantityAvailable
           selectedOptions {
             name
             value
@@ -131,7 +130,6 @@ export type GqlVariant = {
   title: string;
   sku: string | null;
   availableForSale: boolean;
-  quantityAvailable: number | null;
   selectedOptions: { name: string; value: string }[];
   price: GqlMoney;
 };

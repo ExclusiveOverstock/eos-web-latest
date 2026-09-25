@@ -4,7 +4,7 @@
  * swapped for a real `lib/shopify/client.ts` fetch layer in Milestone 3
  * without touching any component that consumes this data.
  *
- * A few EOS-specific fields (lotCode, quantityRemaining, status) are not
+ * A few EOS-specific fields (lotCode, status) are not
  * part of Shopify's schema — in Milestone 3 these will come from Shopify
  * metafields on the product, but are modeled directly here for now.
  */
@@ -31,7 +31,6 @@ export type ProductVariant = {
   sku: string;
   price: Money;
   availableForSale: boolean;
-  quantityAvailable: number;
   selectedOptions: SelectedOption[];
 };
 
@@ -89,16 +88,16 @@ export type Product = {
   description: string;
   lotCode: string;
   status: ProductStatus;
-  /**
-   * Pieces left in the lot, or null when the count is genuinely unknown.
-   *
-   * Shopify only returns `quantityAvailable` when inventory tracking is on
-   * and the app holds the inventory scope; without it every variant comes
-   * back null. Null is NOT zero — rendering it as a number would print
-   * "00 REMAINING" over a lot that is in stock. Surfaces that show a count
-   * must handle null by showing no count at all.
-   */
-  quantityRemaining: number | null;
+  /*
+    No piece count, deliberately.
+
+    The model used to carry `quantityRemaining` and the site printed it.
+    Both were removed by instruction. Dropping the field rather than only
+    the components is the point: anything on Product is serialised into the
+    RSC payload and readable in View Source, so a hidden number is still a
+    published one. `status` is all that remains, and it still comes from
+    live availability.
+  */
   collectionHandles: string[];
   /**
    * Path to a GLB under /public, set from Shopify.

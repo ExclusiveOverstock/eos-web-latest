@@ -125,7 +125,7 @@ export default function ProductCard({ product }: { product: Product }) {
         </span>
 
         <span className="absolute bottom-4 left-4 lg:bottom-7 lg:left-7">
-          <LotStatus status={product.status} quantity={product.quantityRemaining} />
+          <LotStatus status={product.status} />
         </span>
       </div>
 

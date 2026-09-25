@@ -18,11 +18,10 @@ import type { Collection, Product } from "@/lib/shopify/types";
  * deserves, and a filled pill is a heavy shape next to a page of hairlines.
  */
 
-type SortKey = "manifest" | "price-asc" | "price-desc" | "scarcity";
+type SortKey = "manifest" | "price-asc" | "price-desc";
 
 const SORT_LABELS: Record<SortKey, string> = {
   manifest: "Manifest Order",
-  scarcity: "Fewest Remaining",
   "price-asc": "Price — Low to High",
   "price-desc": "Price — High to Low",
 };
@@ -73,18 +72,13 @@ export default function ManifestBrowser({
       list.sort(
         (a, b) => Number(b.priceRange.min.amount) - Number(a.priceRange.min.amount),
       );
-    } else if (sort === "scarcity") {
-      // Open lots by how little is left; closed lots sink to the bottom,
-      // since "0 remaining" is not scarcity, it is history.
-      list.sort((a, b) => {
-        if (a.status !== b.status) return a.status === "OPEN" ? -1 : 1;
-        // Unknown counts sort last among open lots: treating null as 0
-        // would rank an untracked lot as the scarcest thing on the page.
-        const left = a.quantityRemaining ?? Number.POSITIVE_INFINITY;
-        const right = b.quantityRemaining ?? Number.POSITIVE_INFINITY;
-        return left - right;
-      });
     }
+
+    /*
+      There was a "Fewest Remaining" sort here. It is gone with every other
+      stock figure: a control that ranks lots by how little is left tells the
+      visitor the counts even when no number is printed.
+    */
 
     return list;
   }, [products, activeCollection, activeSizes, sort]);

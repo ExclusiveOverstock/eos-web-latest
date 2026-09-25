@@ -21,14 +21,11 @@ export default async function CollectionIndex() {
   const collections = await Promise.all(
     all.map(async (collection) => {
       const products = await getProductsByCollection(collection.handle);
-      const counted = products.every((p) => p.quantityRemaining !== null);
       return {
         ...collection,
-        // Null when any member's count is unknown — see LotStatus. A partial
-        // sum would be a smaller number presented as a complete one.
-        pieces: counted
-          ? products.reduce((sum, p) => sum + (p.quantityRemaining ?? 0), 0)
-          : null,
+        // Lots, not pieces. The site no longer states how much stock exists;
+        // how many lots a collection holds is a fact about the catalogue
+        // rather than about inventory.
         lots: products.length,
       };
     }),
@@ -80,14 +77,7 @@ export default async function CollectionIndex() {
 
             <span className="eos-meta-sm shrink-0 text-right">
               {collection.status === "OPEN" ? (
-                collection.pieces === null ? (
-                  <span className="text-bone">Available</span>
-                ) : (
-                  <span className="tabular-nums text-bone">
-                    {pad2(collection.pieces)}
-                    <span className="ml-2 text-taupe">Remaining</span>
-                  </span>
-                )
+                <span className="text-bone">Available</span>
               ) : (
                 <span className="flex items-center justify-end gap-2 text-taupe">
                   <span aria-hidden="true" className="h-1 w-1 bg-oxblood" />

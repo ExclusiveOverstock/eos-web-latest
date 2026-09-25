@@ -74,7 +74,6 @@ function buildVariants(
     sku: `${lotCode}-${size}`,
     price: { amount: price, currencyCode: "USD" },
     availableForSale: !soldOut,
-    quantityAvailable: soldOut ? 0 : Math.max(1, 5 - i),
     selectedOptions: [{ name: "Size", value: size }],
   }));
 }
@@ -99,7 +98,6 @@ export const PRODUCTS: Product[] = [
       "480gsm loopback cotton from an overrun at a Portuguese mill, cut boxy with a dropped shoulder and a lined hood. The lot was produced against an order that was cut in half after the cloth had already been knitted. Six pieces remain.",
     lotCode: "EOS-014.7",
     status: "OPEN",
-    quantityRemaining: 6,
     // Six knitted, six remaining — nothing has sold yet.
     lotTotal: 6,
     collectionHandles: ["heavyweight"],
@@ -126,7 +124,6 @@ export const PRODUCTS: Product[] = [
       "Double-faced wool overcoat cut from a mill overrun originally produced for a European ready-to-wear house. Full canvas construction, horn buttons, notch lapel. This lot is closed — all six pieces have sold.",
     lotCode: "EOS-014.2",
     status: "CLOSED",
-    quantityRemaining: 0,
     collectionHandles: ["outerwear"],
     specs: specs(
       ["Weight", "740 GSM"],
@@ -151,7 +148,6 @@ export const PRODUCTS: Product[] = [
       "Lambskin moto jacket from a leather goods atelier's surplus run. Asymmetric zip, quilted shoulder panel, satin lining. Nine pieces remain in this lot.",
     lotCode: "EOS-033.2",
     status: "OPEN",
-    quantityRemaining: 9,
     collectionHandles: ["outerwear"],
     specs: specs(
       ["Composition", "Lambskin"],
@@ -176,7 +172,6 @@ export const PRODUCTS: Product[] = [
       "Waxed cotton field jacket from a British outerwear mill's overrun. Corduroy collar, bellows pockets, brass hardware. Five pieces remain.",
     lotCode: "EOS-041.2",
     status: "OPEN",
-    quantityRemaining: 5,
     collectionHandles: ["outerwear"],
     specs: specs(
       ["Weight", "8 OZ"],
@@ -201,7 +196,6 @@ export const PRODUCTS: Product[] = [
       "Half-canvas two-piece suit cut from deadstock Italian wool. Single-breasted, side vents, flat-front trouser. This lot is closed — all four pieces have sold.",
     lotCode: "EOS-026.1",
     status: "CLOSED",
-    quantityRemaining: 0,
     collectionHandles: ["tailoring"],
     specs: specs(
       ["Weight", "280 GSM"],
@@ -226,7 +220,6 @@ export const PRODUCTS: Product[] = [
       "Silk-cotton blend shirting from a shirtmaker's surplus bolt. Mother-of-pearl buttons, single-needle stitching. This lot is closed — all three pieces have sold.",
     lotCode: "EOS-009.1",
     status: "CLOSED",
-    quantityRemaining: 0,
     collectionHandles: ["tailoring"],
     specs: specs(
       ["Composition", "Silk / Cotton"],
@@ -250,7 +243,6 @@ export const PRODUCTS: Product[] = [
       "Fine poplin shirting in slate grey, cut from a shirtmaker's overrun. Point collar, barrel cuff. Eleven pieces remain in this lot.",
     lotCode: "EOS-048.4",
     status: "OPEN",
-    quantityRemaining: 11,
     collectionHandles: ["tailoring"],
     specs: specs(
       ["Composition", "100% Cotton poplin"],
@@ -274,7 +266,6 @@ export const PRODUCTS: Product[] = [
       "14oz raw selvage denim from a small-batch Japanese mill, cut straight. Chain-stitched hem, copper rivets. Fourteen pieces remain — the largest open lot on the manifest.",
     lotCode: "EOS-021.3",
     status: "OPEN",
-    quantityRemaining: 14,
     collectionHandles: ["denim"],
     specs: specs(
       ["Weight", "14 OZ"],
@@ -299,7 +290,6 @@ export const PRODUCTS: Product[] = [
       "Stone-washed selvage denim from an Italian mill's surplus roll, cut tapered. Eight pieces remain in this lot.",
     lotCode: "EOS-052.1",
     status: "OPEN",
-    quantityRemaining: 8,
     collectionHandles: ["denim"],
     specs: specs(
       ["Weight", "12.5 OZ"],
@@ -324,7 +314,6 @@ export const PRODUCTS: Product[] = [
       "Fully-fashioned merino crewneck from a single closed knitwear lot. Ribbed collar, cuff and hem. This lot is closed — sold in full.",
     lotCode: "EOS-017.5",
     status: "CLOSED",
-    quantityRemaining: 0,
     collectionHandles: ["knitwear"],
     specs: specs(
       ["Gauge", "12 GG"],
@@ -349,7 +338,6 @@ export const PRODUCTS: Product[] = [
       "Merino half-zip pullover from the same closed knitwear lot as the crewneck. This lot is closed — sold in full.",
     lotCode: "EOS-017.6",
     status: "CLOSED",
-    quantityRemaining: 0,
     collectionHandles: ["knitwear"],
     specs: specs(
       ["Gauge", "12 GG"],

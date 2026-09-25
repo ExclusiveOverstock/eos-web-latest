@@ -77,11 +77,7 @@ export default function ProductDetail({ product }: { product: Product }) {
               </p>
 
               <div className="mt-9 border-y border-hairline py-7">
-                <LotStatus
-                  status={product.status}
-                  quantity={product.quantityRemaining}
-                  size="lg"
-                />
+                <LotStatus status={product.status} size="lg" />
               </div>
 
               <AddToBag product={product} />
