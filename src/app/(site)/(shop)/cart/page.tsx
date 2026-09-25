@@ -55,7 +55,7 @@ export default function CartPage() {
     return (
       <section className="px-6 py-28 sm:px-10 sm:py-40">
         <div className="mx-auto max-w-[1600px]">
-          <p className="eos-meta-sm text-taupe">Bag</p>
+          <p className="eos-meta-sm text-taupe">Cart</p>
           <h1 className="eos-display mt-6 max-w-[24ch] text-[2.2rem] text-bone sm:text-[3.4rem]">
             Nothing reserved yet.
           </h1>
@@ -74,7 +74,7 @@ export default function CartPage() {
   return (
     <section className="px-6 py-16 sm:px-10 sm:py-24">
       <div className="mx-auto max-w-[1100px]">
-        <p className="eos-meta-sm text-taupe">Bag</p>
+        <p className="eos-meta-sm text-taupe">Cart</p>
         <h1 className="eos-display mt-5 text-[2rem] text-bone sm:text-[2.8rem]">
           Reserved for you.
         </h1>

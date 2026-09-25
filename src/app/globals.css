@@ -38,6 +38,18 @@
   /* Tertiary. Used almost nowhere on purpose — EOS is not a
      black-and-gold brand. Reserved for rare foil-like details. */
   --color-brass: #8b8065;
+  /*
+    Gold, for the Exclusive collection and nothing else.
+
+    The brief's rule is "never black-and-gold", and that still holds: gold is
+    not a second accent spread across the site, it marks one link. It is a
+    lifted brass rather than a yellow — the same family as --color-brass, two
+    steps brighter — so it reads as metal in this palette instead of as a
+    colour borrowed from a different brand. 8.3:1 on void, comfortably
+    readable at the 10px the nav is set in.
+  */
+  --color-gold: #c2a45c;
+  --color-gold-hi: #e8d9a8;
 
   /* --- Structure ------------------------------------------- */
   /* Bone laid over void at 10% and 18% — reads as a drawn line
@@ -386,6 +398,63 @@ button {
   50% {
     transform: translateY(6px);
     opacity: 1;
+  }
+}
+
+/*
+  The gold mark — one nav link, the Exclusive collection.
+
+  "Shining" is done with a slow sheen travelling across the letterforms
+  rather than with a brighter colour: a static bright gold on black is the
+  look the brief rules out, whereas a gradient that moves reads as metal
+  catching light. The gradient runs brass -> gold -> pale -> gold -> brass,
+  so the highlight is a narrow band passing through, not an overall glow.
+
+  `color` is set first and stands alone if `background-clip: text` is not
+  supported, which is why the clipping lives in @supports. Without that
+  fallback the link would render transparent on nothing.
+*/
+.eos-gold {
+  color: var(--color-gold);
+}
+
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .eos-gold {
+    background-image: linear-gradient(
+      100deg,
+      var(--color-brass) 0%,
+      var(--color-gold) 30%,
+      var(--color-gold-hi) 48%,
+      var(--color-gold) 66%,
+      var(--color-brass) 100%
+    );
+    background-size: 260% 100%;
+    background-position: 120% 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: eos-gold-sheen 7s linear infinite;
+  }
+}
+
+@keyframes eos-gold-sheen {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -60% 0;
+  }
+}
+
+/*
+  Reduced motion keeps the gold and drops the travel — the point of the
+  sheen is decorative, and a repeating horizontal sweep is exactly the kind
+  of persistent movement that causes trouble.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .eos-gold {
+    animation: none;
+    background-position: 50% 0;
   }
 }
 

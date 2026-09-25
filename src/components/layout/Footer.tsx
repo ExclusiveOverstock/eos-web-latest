@@ -34,7 +34,6 @@ const COLUMNS: {
     links: [
       { href: "/shop", label: "The Manifest" },
       { href: "/collections", label: "Collections" },
-      { href: "/cart", label: "Bag" },
     ],
   },
   {

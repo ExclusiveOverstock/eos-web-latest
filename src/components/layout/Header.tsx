@@ -7,9 +7,19 @@ import { useCart } from "@/lib/cart/CartContext";
 import { useChrome } from "@/lib/chrome/ChromeContext";
 import { EASE_EOS } from "@/lib/design/tokens";
 
-const NAV_LINKS = [
+/**
+ * `gold` marks one link and is not a general accent.
+ *
+ * The brief's standing rule is "never black-and-gold". That holds: gold does
+ * not appear anywhere else on the site, and spreading it would turn a mark
+ * into a scheme. It is here because the Exclusive collection is the one
+ * thing in the navigation that is meant to look different from its
+ * neighbours.
+ */
+const NAV_LINKS: { href: string; label: string; gold?: boolean }[] = [
   { href: "/collections", label: "Collections" },
   { href: "/shop", label: "Shop" },
+  { href: "/collections/exclusive", label: "Exclusive", gold: true },
   { href: "/about", label: "About" },
 ];
 
@@ -76,12 +86,18 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className={`eos-meta-sm group relative transition-colors duration-500 hover:text-bone ${
-                quiet ? "text-taupe/70" : "text-taupe"
+              className={`eos-meta-sm group relative transition-colors duration-500 ${
+                link.gold
+                  ? "eos-gold"
+                  : `hover:text-bone ${quiet ? "text-taupe/70" : "text-taupe"}`
               }`}
             >
               {link.label}
-              <span className="absolute -bottom-2 left-0 h-px w-0 bg-oxblood transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full" />
+              <span
+                className={`absolute -bottom-2 left-0 h-px w-0 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full ${
+                  link.gold ? "bg-gold" : "bg-oxblood"
+                }`}
+              />
             </Link>
           ))}
         </nav>
@@ -89,10 +105,10 @@ export default function Header() {
         <div className="flex items-center gap-6">
           <Link
             href="/cart"
-            aria-label={`Bag, ${totalQuantity} ${totalQuantity === 1 ? "item" : "items"}`}
+            aria-label={`Cart, ${totalQuantity} ${totalQuantity === 1 ? "item" : "items"}`}
             className="eos-meta-sm flex items-center gap-2 text-taupe transition-colors duration-300 hover:text-bone"
           >
-            <span>Bag</span>
+            <span>Cart</span>
             <span className="tabular-nums text-bone">
               {String(totalQuantity).padStart(2, "0")}
             </span>
@@ -146,7 +162,9 @@ export default function Header() {
                   <Link
                     href={link.href}
                     onClick={() => setOpen(false)}
-                    className="eos-display-sm block py-6 text-[2rem] text-bone"
+                    className={`eos-display-sm block py-6 text-[2rem] ${
+                      link.gold ? "eos-gold" : "text-bone"
+                    }`}
                   >
                     {link.label}
                   </Link>

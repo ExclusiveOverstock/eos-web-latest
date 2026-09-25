@@ -167,18 +167,18 @@ export default function AddToBag({
         }`}
       >
         {added
-          ? "Added to Bag"
+          ? "Added to Cart"
           : missing
             ? `Select a ${missing.name}`
             : selectedVariant?.availableForSale
-              ? "Add to Bag"
+              ? "Add to Cart"
               : "Unavailable"}
       </button>
 
       {/* Announced politely so the confirmation reaches a screen reader
           without stealing focus from the option grid. */}
       <p aria-live="polite" className="sr-only">
-        {added ? `${product.title} added to your bag` : ""}
+        {added ? `${product.title} added to your cart` : ""}
       </p>
     </div>
   );
