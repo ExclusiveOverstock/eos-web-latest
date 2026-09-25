@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/lib/cart/CartContext";
+import { startCheckout } from "@/lib/shopify/checkout";
 import { formatMoney } from "@/lib/shopify/format";
 
 /**
@@ -16,6 +18,38 @@ import { formatMoney } from "@/lib/shopify/format";
 export default function CartPage() {
   const { lines, subtotal, currencyCode, updateQuantity, removeLine, isHydrated } =
     useCart();
+
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  /**
+   * Hand the bag to Shopify and follow it.
+   *
+   * `window.location.assign` rather than the router: the destination is
+   * Shopify's own domain, so there is no route for Next to prefetch or
+   * transition to. `busy` is never cleared on success — the page is on its
+   * way out, and re-enabling the button would let an impatient second click
+   * create a second cart.
+   */
+  async function handleCheckout() {
+    setBusy(true);
+    setError(null);
+
+    const result = await startCheckout(
+      lines.map((line) => ({
+        merchandiseId: line.variantId,
+        quantity: line.quantity,
+      })),
+    );
+
+    if (result.ok) {
+      window.location.assign(result.url);
+      return;
+    }
+
+    setError(result.error);
+    setBusy(false);
+  }
 
   if (isHydrated && lines.length === 0) {
     return (
@@ -125,21 +159,33 @@ export default function CartPage() {
             </span>
           </div>
 
-          {/*
-            Deliberately disabled rather than hidden. Checkout is Shopify's,
-            and it is not connected yet — a button that pretends otherwise
-            would be the one genuinely dishonest thing on the site.
-          */}
           <button
             type="button"
-            disabled
+            onClick={handleCheckout}
+            disabled={busy || lines.length === 0}
             className="eos-btn eos-btn-primary w-full max-w-sm"
           >
-            Checkout — Not Yet Connected
+            {busy ? "Opening Checkout…" : "Checkout"}
           </button>
-          <p className="eos-meta-sm max-w-sm text-right text-taupe">
-            Payment and fulfilment move to Shopify at Milestone 3.
-          </p>
+
+          {/*
+            Errors are shown, not swallowed. The likeliest one by far is a lot
+            selling out between the bag and the button, which on this store is
+            an ordinary event rather than a fault — so it reads as information
+            and the bag stays exactly as it was.
+          */}
+          {error ? (
+            <p
+              role="alert"
+              className="eos-meta-sm max-w-sm text-right text-bone"
+            >
+              {error}
+            </p>
+          ) : (
+            <p className="eos-meta-sm max-w-sm text-right text-taupe">
+              Payment and delivery are handled by Shopify.
+            </p>
+          )}
         </div>
       </div>
     </section>

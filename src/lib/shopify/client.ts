@@ -32,6 +32,15 @@ export class StorefrontError extends Error {
 export async function storefront<T>(
   query: string,
   variables: Record<string, unknown> = {},
+  /**
+   * Mutations must not be cached.
+   *
+   * Every read on this site is a catalog read, so caching by tag is the right
+   * default and stays the default. A cart mutation is the opposite: it has a
+   * side effect, and serving a cached `cartCreate` would hand a second
+   * shopper the first shopper's cart. Callers that write pass `write: true`.
+   */
+  { write = false }: { write?: boolean } = {},
 ): Promise<T> {
   const token = storefrontToken();
 
@@ -45,10 +54,14 @@ export async function storefront<T>(
       ...(token ? { "X-Shopify-Storefront-Access-Token": token } : {}),
     },
     body: JSON.stringify({ query, variables }),
-    next: {
-      revalidate: CATALOG_REVALIDATE_SECONDS,
-      tags: [CATALOG_TAG],
-    },
+    ...(write
+      ? { cache: "no-store" as const }
+      : {
+          next: {
+            revalidate: CATALOG_REVALIDATE_SECONDS,
+            tags: [CATALOG_TAG],
+          },
+        }),
   });
 
   if (!response.ok) {
