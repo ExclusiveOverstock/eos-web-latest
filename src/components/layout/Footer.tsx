@@ -9,13 +9,20 @@ const INSTAGRAM_URL = `https://www.instagram.com/${INSTAGRAM_HANDLE}/`;
 /**
  * The physical store.
  *
- * Null until a real address is supplied, and rendered only when it is not.
- * An invented street address on a storefront is not a placeholder — it is a
- * claim about where a business can be found, and someone will eventually
- * drive to it. Set `lines` to the address as it should be read, and
- * `mapsUrl` to a share link from any maps provider, and the block appears.
+ * Taken from the business's own Google listing rather than typed from
+ * memory, because someone will eventually drive to it. Google formats the
+ * first line oddly — it returns "Block, 40, E Islam Park St" — so it is set
+ * out here the way it would be read aloud.
+ *
+ * `hours` is deliberately unset. The listing showed an 11am open and a 10pm
+ * close but not which days those apply to, and publishing opening times that
+ * are right five days a week and wrong two is worse than publishing none:
+ * the failure lands on a customer standing outside a shut door.
  */
-const STORE: { lines: string[]; mapsUrl?: string; hours?: string } | null = null;
+const STORE: { lines: string[]; mapsUrl?: string; hours?: string } | null = {
+  lines: ["40 E Islam Park Street", "Lahore 54000", "Pakistan"],
+  mapsUrl: "https://share.google/WQsr4aJdyljyW3lvH",
+};
 
 /**
  * `href` is optional: an entry without one renders as plain text.
