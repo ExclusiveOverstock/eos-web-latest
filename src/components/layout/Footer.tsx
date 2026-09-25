@@ -48,7 +48,7 @@ const COLUMNS: {
     links: [
       { href: "/about", label: "Sizing & Fit" },
       { href: "/about", label: "Shipping" },
-      { href: "/about", label: "Returns" },
+      { href: "/returns", label: "Returns & Exchanges" },
     ],
   },
 ];
