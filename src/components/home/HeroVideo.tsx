@@ -99,12 +99,23 @@ export default function HeroVideo({ className = "" }: { className?: string }) {
         ref={ref}
         src="/video/hero.mp4"
         /**
-         * No `poster`. A poster would flash a still before the film starts;
-         * without one the element is simply transparent over `bg-void` until
-         * the first frame decodes — which is the opening beat this hero was
-         * designed around. Black, then the piece. The missing asset is the
-         * correct behaviour, not an oversight.
+         * A poster, reversing an earlier decision.
+         *
+         * This deliberately had none: the element sat transparent over
+         * `bg-void` until the first frame decoded, which matched the opening
+         * beat — black, then the piece.
+         *
+         * That reasoning only held while the film was guaranteed to play. It
+         * is not. A browser refuses muted autoplay under battery saver, data
+         * saver, or an explicit user setting, and when it does the hero is a
+         * black rectangle with the browser's own play glyph on it — the
+         * worst possible first impression, and nothing the site can override.
+         *
+         * With a poster the same visitor gets the frame as a still image and
+         * the page reads as designed whether or not the video ever runs.
+         * Drawn from the film itself at 1.4s, 1200x675, 67KB.
          */
+        poster="/video/hero-poster.jpg"
         muted
         loop
         playsInline
