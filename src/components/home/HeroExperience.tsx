@@ -37,8 +37,8 @@ import { ImmersiveChrome } from "@/lib/chrome/ChromeContext";
 /** Copy beats on the 0–1 scroll track: in over [a,b], out over [c,d]. */
 const BEATS = {
   marker: [0.02, 0.08, 0.13, 0.19],
-  statement: [0.15, 0.25, 0.38, 0.46],
-  counter: [0.47, 0.56, 0.68, 0.77],
+  statement: [0.15, 0.24, 0.34, 0.42],
+  counter: [0.43, 0.52, 0.64, 0.73],
 } as const;
 
 function useBeat(progress: MotionValue<number>, range: readonly [number, number, number, number]) {
@@ -67,7 +67,7 @@ export default function HeroExperience({ lotCode }: { lotCode?: string }) {
   const marker = useBeat(scrollYProgress, BEATS.marker);
   const statement = useBeat(scrollYProgress, BEATS.statement);
   const counter = useBeat(scrollYProgress, BEATS.counter);
-  const handoff = useTransform(scrollYProgress, [0.78, 0.88], [0, 1]);
+  const handoff = useTransform(scrollYProgress, [0.72, 0.84], [0, 1]);
   const scrollCue = useTransform(scrollYProgress, [0, 0.06, 0.11], [0, 1, 0]);
 
   const film = <HeroVideo className="absolute inset-0 h-full w-full" />;
@@ -129,10 +129,19 @@ export default function HeroExperience({ lotCode }: { lotCode?: string }) {
   return (
     <section
       ref={track}
-      // Three and a bit viewport-heights of track for one pinned viewport:
-      // room for the camera move to breathe without the visitor feeling they
-      // are scrolling through treacle.
-      className="relative h-[340vh]"
+      /*
+        Two and a half viewport-heights of track for one pinned viewport,
+        which leaves about one and a half screens of actual scrolling.
+
+        It was 3.4, sized for a scroll-driven camera move that no longer
+        exists — the frame now holds a film that plays on its own, so the
+        scroll is only cross-fading four short pieces of copy. At the old
+        length the second statement sat on screen doing nothing while the
+        visitor kept scrolling, and reaching the archive took over two full
+        screens. The beats are fractions of the track, so shortening it
+        compresses them all proportionally.
+      */
+      className="relative h-[250vh]"
       aria-label="EOS opening"
     >
       <ImmersiveChrome />
