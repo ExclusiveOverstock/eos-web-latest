@@ -20,9 +20,21 @@ export const STORE: {
   lines: string[];
   mapsUrl?: string;
   hours?: string;
+  /** Display form. `phoneHref` is the dialable one. */
+  phone?: string;
+  phoneHref?: string;
 } = {
   lines: ["40 E Islam Park Street", "Lahore 54000", "Pakistan"],
   mapsUrl: "https://share.google/WQsr4aJdyljyW3lvH",
+  /**
+   * Written for reading and dialled from a second value.
+   *
+   * A `tel:` href has to be unpunctuated and in full international form or
+   * some phones refuse it; a number printed that way is harder for a person
+   * to read back. Keeping the two apart means neither is compromised.
+   */
+  phone: "+92 345 3186326",
+  phoneHref: "tel:+923453186326",
 };
 
 /** Single line, for prose that cannot use the stacked form. */

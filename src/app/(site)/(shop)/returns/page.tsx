@@ -37,9 +37,16 @@ const POLICY = {
   returnPostage: "the customer",
   /** How a refund reaches a Cash on Delivery customer. CONFIRM THIS. */
   refundMethod: "bank transfer",
-  /** Where a return is started. CONFIRM THIS — an email address would be better. */
-  contactLabel: "Instagram",
-  contactHref: "https://www.instagram.com/exclusive_overstock/",
+  /**
+   * Where a return is started.
+   *
+   * The shop's phone, not an Instagram DM. A DM is a poor record if a return
+   * is ever disputed, and it is not a channel everyone buying by Cash on
+   * Delivery uses. The number comes from the shared store module so it
+   * cannot drift from the one in the footer.
+   */
+  contactLabel: STORE.phone ?? "Instagram",
+  contactHref: STORE.phoneHref ?? "https://www.instagram.com/exclusive_overstock/",
 } as const;
 
 const STEPS = [
@@ -173,16 +180,12 @@ export default function ReturnsPage() {
                 <div>
                   <p className="eos-meta-sm text-hairline-strong">By post</p>
                   <p className="eos-display-sm mt-4 max-w-[26ch] text-[1.3rem] text-bone sm:text-[1.6rem]">
-                    Message us with your order number and we will tell you
-                    where to send it.
+                    Call us with your order number and we will tell you where
+                    to send it.
                   </p>
                 </div>
-                <a
-                  href={POLICY.contactHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="eos-btn eos-btn-quiet self-start"
-                >
+                {/* A tel: link, so it dials on a phone and copies on a desktop. */}
+                <a href={POLICY.contactHref} className="eos-btn eos-btn-quiet self-start">
                   {POLICY.contactLabel}
                 </a>
               </div>

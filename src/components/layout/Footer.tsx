@@ -28,8 +28,15 @@ const COLUMNS: {
   {
     heading: "Service",
     links: [
-      { href: "/about", label: "Sizing & Fit" },
-      { href: "/about", label: "Shipping" },
+      /*
+        Shipping and Sizing are absent rather than linked.
+        
+        Both used to point at /about, which is a small broken promise: a
+        visitor clicking "Shipping" expecting rates got the brand story.
+        Shipping has no page because the rate differs across Pakistan and
+        cannot be stated as one number. Sizing returns as soon as there are
+        measurements to put on it.
+      */
       { href: "/returns", label: "Returns & Exchanges" },
     ],
   },
@@ -122,6 +129,14 @@ export default function Footer() {
                   <p className="eos-meta-sm mt-3 text-hairline-strong">
                     {STORE.hours}
                   </p>
+                ) : null}
+                {STORE.phone && STORE.phoneHref ? (
+                  <a
+                    href={STORE.phoneHref}
+                    className="eos-meta-sm mt-3 block text-taupe transition-colors duration-300 hover:text-bone"
+                  >
+                    {STORE.phone}
+                  </a>
                 ) : null}
                 {STORE.mapsUrl ? (
                   <a
