@@ -28,7 +28,7 @@ function Entry({
       {closed ? (
         <span className="flex items-center gap-2 text-taupe">
           <span aria-hidden="true" className="h-1 w-1 bg-oxblood" />
-          Lot Closed
+          Out of Stock
         </span>
       ) : (
         <span className="text-bone">Available</span>

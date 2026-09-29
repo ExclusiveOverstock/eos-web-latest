@@ -65,7 +65,7 @@ export default async function CollectionPage({
             {closed ? (
               <>
                 <span className="eos-meta inline-block bg-oxblood px-3 py-1.5 text-bone">
-                  Fully Closed
+                  Out of Stock
                 </span>
                 <p className="eos-meta-sm mt-4 text-taupe">
                   Every lot in this collection has sold. Nothing here returns.
