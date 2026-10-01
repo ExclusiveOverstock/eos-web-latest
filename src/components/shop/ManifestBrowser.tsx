@@ -103,6 +103,7 @@ export default function ManifestBrowser({
             ]}
             isActive={(value) => activeCollection === value}
             onSelect={setActiveCollection}
+            isGold={(value) => value === "exclusive"}
           />
 
           <Filter
@@ -170,11 +171,20 @@ function Filter({
   options,
   isActive,
   onSelect,
+  isGold,
 }: {
   label: string;
   options: { value: string; label: string }[];
   isActive: (value: string) => boolean;
   onSelect: (value: string) => void;
+  /**
+   * Marks one option as the gold one — the Exclusive collection, matching
+   * the header. It stays gold whether or not it is the active filter, the
+   * same way the nav link is always gold: the colour says what the
+   * collection is, not what the visitor has clicked. Selection is still
+   * shown by the underline beneath it.
+   */
+  isGold?: (value: string) => boolean;
 }) {
   return (
     <div>
@@ -182,6 +192,7 @@ function Filter({
       <div className="mt-4 flex flex-wrap gap-x-6 gap-y-3">
         {options.map((option) => {
           const active = isActive(option.value);
+          const gold = isGold?.(option.value) ?? false;
           return (
             <button
               key={option.value}
@@ -189,14 +200,18 @@ function Filter({
               aria-pressed={active}
               onClick={() => onSelect(option.value)}
               className={`eos-meta-sm relative pb-1.5 transition-colors duration-300 ${
-                active ? "text-bone" : "text-taupe hover:text-bone"
+                gold
+                  ? "eos-gold"
+                  : active
+                    ? "text-bone"
+                    : "text-taupe hover:text-bone"
               }`}
             >
               {option.label}
               <span
                 aria-hidden="true"
                 className={`absolute inset-x-0 bottom-0 h-px transition-colors duration-300 ${
-                  active ? "bg-oxblood" : "bg-transparent"
+                  active ? (gold ? "bg-gold" : "bg-oxblood") : "bg-transparent"
                 }`}
               />
             </button>

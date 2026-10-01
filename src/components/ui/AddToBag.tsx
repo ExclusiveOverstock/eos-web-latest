@@ -114,7 +114,7 @@ export default function AddToBag({
         <button type="button" disabled className="eos-btn w-full sm:w-auto sm:min-w-[300px]">
           Out of Stock
         </button>
-        <p className="eos-meta-sm mt-4 text-taupe">Restocking soon.</p>
+        <p className="eos-meta-sm mt-4 text-taupe">Restock soon.</p>
       </div>
     );
   }

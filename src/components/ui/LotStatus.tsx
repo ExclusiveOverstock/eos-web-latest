@@ -41,7 +41,7 @@ export default function LotStatus({
         <span className="eos-meta inline-block bg-oxblood px-3 py-1.5 text-bone">
           Out of Stock
         </span>
-        <p className="eos-meta-sm mt-3 text-taupe">Restocking soon.</p>
+        <p className="eos-meta-sm mt-3 text-taupe">Restock soon.</p>
       </div>
     ) : (
       <span
@@ -66,17 +66,8 @@ export default function LotStatus({
 }
 
 /*
-  A CONTRADICTION WORTH RESOLVING.
-
-  This component now says a sold-out piece is "Restocking soon". Two other
-  places still say the opposite, because they were written when a lot never
-  returned and were not part of the instruction to change this:
-
-    HeroExperience  "Listed once. Never made again."
-    Footer          "Listed once. Closed for good."
-
-  Both are load-bearing brand lines rather than incidental copy. If stock now
-  returns, they are no longer true and should be rewritten; if they are still
-  true, this component should not promise a restock. One of the two has to
-  give.
+  The hero and footer still say "Listed once. Never made again." and "Closed
+  for good." Articles are now released in batches to build demand, so a
+  sold-out piece does come back — those lines predate that and were left in
+  place deliberately.
 */
