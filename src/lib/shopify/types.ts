@@ -30,6 +30,14 @@ export type ProductVariant = {
   title: string;
   sku: string;
   price: Money;
+  /**
+   * The price this was before it was marked down, or null at full price.
+   *
+   * Shopify's "Compare at price". It is the only honest way to show a
+   * discount: the number comes from the store rather than from a figure
+   * typed into the site, so a sale ends the moment the merchant ends it.
+   */
+  compareAtPrice: Money | null;
   availableForSale: boolean;
   selectedOptions: SelectedOption[];
 };
@@ -126,6 +134,13 @@ export type Product = {
     min: Money;
     max: Money;
   };
+  /**
+   * What `priceRange.min` used to cost, or null at full price.
+   *
+   * Derived in the mapper from the cheapest variant's compare-at, and only
+   * when it is genuinely higher than the price being shown.
+   */
+  compareAtPrice: Money | null;
 };
 
 export type Collection = {

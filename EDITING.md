@@ -37,6 +37,43 @@ follows within about a minute.** Nothing to edit, nothing to redeploy.
 
 ---
 
+## The discount banner at the top of the page
+
+`src/lib/site/promo.ts`. The whole thing lives in one object:
+
+```ts
+export const PROMO = {
+  active: true,
+  text: "20% off everything",
+  code: undefined,
+  href: "/shop",
+};
+```
+
+| Field | What it does |
+|---|---|
+| `active` | `false` hides the bar completely. Nothing else to change. |
+| `text` | What it says. Keep it to one short line — two lines push the whole site down on a phone. |
+| `code` | A code to show, e.g. `"EOS20"`. Leave it as `undefined` if the discount is automatic. |
+| `href` | Where the bar links. `"/shop"` is the usual answer. |
+
+To end a sale, change `active: true` to `active: false`. That is the entire
+operation.
+
+---
+
+## Putting a product on sale
+
+No code at all. In Shopify, open the product, and set **Compare at price**
+to the original price while setting **Price** to the new one.
+
+The site then shows the new price with the old one struck through beside it,
+on both the grid and the product page. Remove the compare-at price and it
+goes back to normal. Setting them equal shows nothing, so you cannot create
+a fake "discount" by accident.
+
+---
+
 ## Swapping the media
 
 No code — just replace the file, keeping the **exact same filename**.

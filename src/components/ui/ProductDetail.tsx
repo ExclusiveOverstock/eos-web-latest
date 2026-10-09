@@ -2,7 +2,7 @@ import Link from "next/link";
 import ProductGallery from "./ProductGallery";
 import AddToBag from "./AddToBag";
 import LotStatus from "./LotStatus";
-import { formatMoney } from "@/lib/shopify/format";
+import Price from "./Price";
 import type { Product } from "@/lib/shopify/types";
 
 /**
@@ -72,9 +72,12 @@ export default function ProductDetail({ product }: { product: Product }) {
                 {product.title}
               </h1>
 
-              <p className="eos-meta mt-6 text-bone">
-                {formatMoney(product.priceRange.min)}
-              </p>
+              <Price
+                amount={product.priceRange.min}
+                compareAt={product.compareAtPrice}
+                size="lg"
+                className="mt-6"
+              />
 
               <div className="mt-9 border-y border-hairline py-7">
                 <LotStatus status={product.status} size="lg" />

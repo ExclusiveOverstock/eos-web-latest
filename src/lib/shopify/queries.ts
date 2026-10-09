@@ -64,6 +64,10 @@ const PRODUCT_FIELDS = /* GraphQL */ `
             amount
             currencyCode
           }
+          compareAtPrice {
+            amount
+            currencyCode
+          }
         }
       }
     }
@@ -132,6 +136,7 @@ export type GqlVariant = {
   availableForSale: boolean;
   selectedOptions: { name: string; value: string }[];
   price: GqlMoney;
+  compareAtPrice: GqlMoney | null;
 };
 
 export type GqlImage = {

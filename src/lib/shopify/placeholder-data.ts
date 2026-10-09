@@ -73,6 +73,7 @@ function buildVariants(
     title: size,
     sku: `${lotCode}-${size}`,
     price: { amount: price, currencyCode: "USD" },
+    compareAtPrice: null,
     availableForSale: !soldOut,
     selectedOptions: [{ name: "Size", value: size }],
   }));
@@ -115,6 +116,7 @@ export const PRODUCTS: Product[] = [
     options: sizeOption(["S", "M", "L", "XL"]),
     variants: buildVariants("EOS-014.7", "285.00", ["S", "M", "L", "XL"]),
     priceRange: { min: { amount: "285.00", currencyCode: "USD" }, max: { amount: "285.00", currencyCode: "USD" } },
+    compareAtPrice: null,
   },
   {
     id: "prod-wool-overcoat-charcoal",
@@ -139,6 +141,7 @@ export const PRODUCTS: Product[] = [
     options: sizeOption(["S", "M", "L", "XL"]),
     variants: buildVariants("EOS-014.2", "480.00", ["S", "M", "L", "XL"], true),
     priceRange: { min: { amount: "480.00", currencyCode: "USD" }, max: { amount: "480.00", currencyCode: "USD" } },
+    compareAtPrice: null,
   },
   {
     id: "prod-leather-moto-jacket",
@@ -163,6 +166,7 @@ export const PRODUCTS: Product[] = [
     options: sizeOption(["S", "M", "L"]),
     variants: buildVariants("EOS-033.2", "690.00", ["S", "M", "L"]),
     priceRange: { min: { amount: "690.00", currencyCode: "USD" }, max: { amount: "690.00", currencyCode: "USD" } },
+    compareAtPrice: null,
   },
   {
     id: "prod-waxed-field-jacket",
@@ -187,6 +191,7 @@ export const PRODUCTS: Product[] = [
     options: sizeOption(["S", "M", "L", "XL"]),
     variants: buildVariants("EOS-041.2", "340.00", ["S", "M", "L", "XL"]),
     priceRange: { min: { amount: "340.00", currencyCode: "USD" }, max: { amount: "340.00", currencyCode: "USD" } },
+    compareAtPrice: null,
   },
   {
     id: "prod-tailored-wool-suit",
@@ -211,6 +216,7 @@ export const PRODUCTS: Product[] = [
     options: sizeOption(["38R", "40R", "42R", "44R"]),
     variants: buildVariants("EOS-026.1", "780.00", ["38R", "40R", "42R", "44R"], true),
     priceRange: { min: { amount: "780.00", currencyCode: "USD" }, max: { amount: "780.00", currencyCode: "USD" } },
+    compareAtPrice: null,
   },
   {
     id: "prod-silk-shirting-ivory",
@@ -234,6 +240,7 @@ export const PRODUCTS: Product[] = [
     options: sizeOption(["S", "M", "L"]),
     variants: buildVariants("EOS-009.1", "165.00", ["S", "M", "L"], true),
     priceRange: { min: { amount: "165.00", currencyCode: "USD" }, max: { amount: "165.00", currencyCode: "USD" } },
+    compareAtPrice: null,
   },
   {
     id: "prod-cotton-poplin-shirt-slate",
@@ -257,6 +264,7 @@ export const PRODUCTS: Product[] = [
     options: sizeOption(["S", "M", "L", "XL"]),
     variants: buildVariants("EOS-048.4", "145.00", ["S", "M", "L", "XL"]),
     priceRange: { min: { amount: "145.00", currencyCode: "USD" }, max: { amount: "145.00", currencyCode: "USD" } },
+    compareAtPrice: null,
   },
   {
     id: "prod-raw-selvage-denim-straight",
@@ -281,6 +289,7 @@ export const PRODUCTS: Product[] = [
     options: sizeOption(["28", "30", "32", "34", "36"]),
     variants: buildVariants("EOS-021.3", "260.00", ["28", "30", "32", "34", "36"]),
     priceRange: { min: { amount: "260.00", currencyCode: "USD" }, max: { amount: "260.00", currencyCode: "USD" } },
+    compareAtPrice: null,
   },
   {
     id: "prod-washed-selvage-denim-tapered",
@@ -305,6 +314,7 @@ export const PRODUCTS: Product[] = [
     options: sizeOption(["28", "30", "32", "34"]),
     variants: buildVariants("EOS-052.1", "275.00", ["28", "30", "32", "34"]),
     priceRange: { min: { amount: "275.00", currencyCode: "USD" }, max: { amount: "275.00", currencyCode: "USD" } },
+    compareAtPrice: null,
   },
   {
     id: "prod-merino-knit-crewneck",
@@ -329,6 +339,7 @@ export const PRODUCTS: Product[] = [
     options: sizeOption(["S", "M", "L", "XL"]),
     variants: buildVariants("EOS-017.5", "210.00", ["S", "M", "L", "XL"], true),
     priceRange: { min: { amount: "210.00", currencyCode: "USD" }, max: { amount: "210.00", currencyCode: "USD" } },
+    compareAtPrice: null,
   },
   {
     id: "prod-merino-half-zip",
@@ -353,6 +364,7 @@ export const PRODUCTS: Product[] = [
     options: sizeOption(["S", "M", "L"]),
     variants: buildVariants("EOS-017.6", "230.00", ["S", "M", "L"], true),
     priceRange: { min: { amount: "230.00", currencyCode: "USD" }, max: { amount: "230.00", currencyCode: "USD" } },
+    compareAtPrice: null,
   },
 ];
 

@@ -147,6 +147,7 @@ export function mapProduct(product: GqlProduct): Product {
     title: v.title,
     sku: v.sku ?? "",
     price: v.price,
+    compareAtPrice: v.compareAtPrice ?? null,
     availableForSale: v.availableForSale,
     // Null means Shopify would not tell us — see the note in queries.ts.
     selectedOptions: v.selectedOptions,
@@ -155,6 +156,26 @@ export function mapProduct(product: GqlProduct): Product {
   const status: ProductStatus = variants.some((v) => v.availableForSale)
     ? "OPEN"
     : "CLOSED";
+
+  /**
+   * The compare-at price that belongs beside the displayed price.
+   *
+   * The card and the product page both show the cheapest variant, so the
+   * struck-through figure has to be that variant's compare-at and not, say,
+   * the highest in the product — pairing a low sale price with a high old
+   * one would overstate the discount. It is dropped unless it is actually
+   * greater than the price, because Shopify lets a compare-at be left equal
+   * to the price, and "PKR 1,800, was PKR 1,800" is noise.
+   */
+  const cheapest = variants.reduce<ProductVariant | undefined>(
+    (low, v) => (!low || Number(v.price.amount) < Number(low.price.amount) ? v : low),
+    undefined,
+  );
+  const compareAt =
+    cheapest?.compareAtPrice &&
+    Number(cheapest.compareAtPrice.amount) > Number(cheapest.price.amount)
+      ? cheapest.compareAtPrice
+      : null;
 
   const images = nodes(product.images);
   const tone = toneFor(product.handle);
@@ -201,6 +222,7 @@ export function mapProduct(product: GqlProduct): Product {
       min: product.priceRange.minVariantPrice,
       max: product.priceRange.maxVariantPrice,
     },
+    compareAtPrice: compareAt,
   };
 }
 

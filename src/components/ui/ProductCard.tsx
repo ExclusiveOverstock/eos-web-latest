@@ -5,7 +5,7 @@ import { shopifyImageLoader } from "@/lib/shopify/image-loader";
 import Link from "next/link";
 import { useState } from "react";
 import type { Product } from "@/lib/shopify/types";
-import { formatMoney } from "@/lib/shopify/format";
+import Price from "./Price";
 import LotStatus from "./LotStatus";
 
 /**
@@ -122,9 +122,10 @@ export default function ProductCard({ product }: { product: Product }) {
         <h3 className="eos-display-sm text-[0.9rem] text-bone lg:text-[1.2rem]">
           {product.title}
         </h3>
-        <p className="eos-meta-sm text-taupe">
-          {formatMoney(product.priceRange.min)}
-        </p>
+        <Price
+          amount={product.priceRange.min}
+          compareAt={product.compareAtPrice}
+        />
       </div>
     </Link>
   );
