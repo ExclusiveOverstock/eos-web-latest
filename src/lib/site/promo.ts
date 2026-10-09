@@ -31,7 +31,7 @@ export const PROMO: {
   href?: string;
 } = {
   active: true,
-  text: "20% off everything",
+  text: "20% off everything but Exclusive",
   code: undefined,
   href: "/shop",
 };
