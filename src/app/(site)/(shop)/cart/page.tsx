@@ -155,7 +155,7 @@ export default function CartPage() {
           <div className="eos-meta flex w-full max-w-sm items-baseline justify-between">
             <span className="text-taupe">Subtotal</span>
             <span className="tabular-nums text-bone">
-              {formatMoney({ amount: subtotal.toFixed(2), currencyCode })}
+              {formatMoney({ amount: String(subtotal), currencyCode })}
             </span>
           </div>
 
