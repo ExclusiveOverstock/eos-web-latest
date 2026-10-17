@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/lib/cart/CartContext";
 import { startCheckout } from "@/lib/shopify/checkout";
+import { trackMeta } from "@/lib/site/analytics";
 import { formatMoney } from "@/lib/shopify/format";
 
 /**
@@ -34,6 +35,25 @@ export default function CartPage() {
   async function handleCheckout() {
     setBusy(true);
     setError(null);
+
+    /*
+      Fired before the redirect, not after — there is no after. The next
+      thing that happens on success is the browser leaving for Shopify's
+      domain, which would cancel any in-flight request this made.
+
+      It is also fired before we know the cart was accepted, which is the
+      right trade here: InitiateCheckout means "a customer tried to pay",
+      and someone blocked by a sold-out line tried just as genuinely as
+      someone who got through. Purchase is the event that must be exact,
+      and that one belongs to Shopify.
+    */
+    trackMeta("InitiateCheckout", {
+      content_ids: lines.map((line) => line.variantId),
+      content_type: "product",
+      num_items: lines.reduce((sum, line) => sum + line.quantity, 0),
+      value: subtotal,
+      currency: currencyCode,
+    });
 
     const result = await startCheckout(
       lines.map((line) => ({

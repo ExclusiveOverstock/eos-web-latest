@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useCart } from "@/lib/cart/CartContext";
+import { trackMeta } from "@/lib/site/analytics";
 import type { Product, ProductVariant } from "@/lib/shopify/types";
 
 /**
@@ -106,6 +107,24 @@ export default function AddToBag({
     );
     setAdded(true);
     window.setTimeout(() => setAdded(false), 2000);
+
+    /*
+      Fired after the line is in the cart, never before. If the tracking
+      call were first and somehow threw, the customer would get an event
+      recorded for a product that never reached their cart — the one
+      ordering that produces numbers nobody can reconcile.
+
+      `content_ids` carries the variant GID rather than the handle, because
+      that is what the cart and Shopify's own events use, so the same
+      identifier appears at every step of the funnel.
+    */
+    trackMeta("AddToCart", {
+      content_ids: [selectedVariant.id],
+      content_name: product.title,
+      content_type: "product",
+      value: Number(selectedVariant.price.amount),
+      currency: selectedVariant.price.currencyCode,
+    });
   }
 
   if (allSoldOut) {
