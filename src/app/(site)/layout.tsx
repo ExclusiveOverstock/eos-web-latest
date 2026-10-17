@@ -1,5 +1,6 @@
 import Header from "@/components/layout/Header";
 import MetaPixel from "@/components/layout/MetaPixel";
+import PixelDebug from "@/components/layout/PixelDebug";
 import PromoBar from "@/components/layout/PromoBar";
 import Footer from "@/components/layout/Footer";
 import Cursor from "@/components/ui/Cursor";
@@ -38,6 +39,7 @@ export default function SiteLayout({
             Skip to content
           </a>
           <MetaPixel />
+          <PixelDebug />
           <PromoBar />
           <Header />
           <main id="main" className="flex-1">

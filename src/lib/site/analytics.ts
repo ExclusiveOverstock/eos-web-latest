@@ -81,21 +81,26 @@ function debugging(): boolean {
   }
 }
 
-/*
-  Read the flag as soon as this module reaches the browser, rather than
-  waiting for the first event.
-
-  Nothing calls `trackMeta` on page load — the two call sites are Add to
-  Cart and Checkout — so a lazy check would never see the query string of
-  the page the flag was typed on. The visitor would open
-  /products/x?pixeldebug=1, navigate once, and arrive at the button with
-  the flag still unread and now unreadable.
-
-  Evaluating here catches it while the URL is still the one that carried
-  it. The call is also what writes it to storage, so the side effect is
-  the point rather than an accident of ordering.
-*/
-if (typeof window !== "undefined") debugging();
+/**
+ * Notice the flag while the URL that carries it is still the current one.
+ *
+ * Nothing calls `trackMeta` on page load — the two call sites are Add to
+ * Cart and Checkout — so without this the query string is never read on
+ * the page it was typed on. Open /shop?pixeldebug=1, click a product, and
+ * the flag is gone before anything thinks to look for it.
+ *
+ * It must be called from a component mounted on every page, because this
+ * module is not on every page: the pixel component that imports it is a
+ * server component, so on most routes `analytics.ts` never reaches the
+ * browser at all. Reading the flag from module scope here looks like it
+ * would work and does nothing.
+ *
+ * Calling `debugging()` is the whole implementation — reading the flag is
+ * what writes it down.
+ */
+export function capturePixelDebugFlag() {
+  debugging();
+}
 
 function log(...args: unknown[]) {
   if (debugging()) console.info("[eos pixel]", ...args);
