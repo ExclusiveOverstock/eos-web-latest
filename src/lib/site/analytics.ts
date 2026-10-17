@@ -35,25 +35,115 @@ declare global {
 }
 
 /**
- * Fire a standard Meta event, if the pixel is there to hear it.
+ * Turn tracking diagnostics on.
  *
- * Every call site is a commercial moment — something was added, someone
- * went to pay — and none of them may break because a tracker did not load.
- * Ad blockers remove `fbq` entirely, the pixel can be switched off above,
- * and the script loads after the page is interactive, so there is a window
- * where a fast click lands before it exists. All three are the same case
- * and all three are survivable: no pixel, no event, no error.
+ * Off by default, because a storefront should not narrate its analytics to
+ * every visitor's console. Switch it on for a session in either way:
  *
- * Wrapped in try/catch as well as guarded. A tracking script is third-party
- * code that can throw for reasons we never see, and a thrown analytics call
- * inside an add-to-cart handler would break the thing the customer actually
- * asked for.
+ *   add ?pixeldebug=1 to any URL
+ *   run  localStorage.eosPixelDebug = "1"  in the console, then reload
+ *
+ * With it on, every tracking attempt prints what happened — sent, queued,
+ * or failed, and why. This exists because the previous version failed
+ * silently in all three cases, which is indistinguishable from not being
+ * called at all.
+ */
+function debugging(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return (
+      new URLSearchParams(window.location.search).has("pixeldebug") ||
+      window.localStorage.getItem("eosPixelDebug") === "1"
+    );
+  } catch {
+    return false;
+  }
+}
+
+function log(...args: unknown[]) {
+  if (debugging()) console.info("[eos pixel]", ...args);
+}
+
+/**
+ * Events that arrived before the pixel did.
+ *
+ * THE BUG THIS FIXES. `fbq` is defined by an inline script that runs
+ * `afterInteractive` — deliberately, so analytics never delays the page.
+ * React hydrates before that, so there is a real window in which the Add to
+ * Cart button works and `window.fbq` does not yet exist. The old guard
+ * returned early in that window and the event was gone for good: the
+ * customer added something, the cart updated, and Meta never heard about
+ * it. Nothing logged, because the guard was silent.
+ *
+ * Queueing instead of dropping closes it. Anything fired early waits here
+ * and is flushed the moment the pixel appears.
+ */
+const pending: { event: string; params?: Record<string, unknown> }[] = [];
+let flushTimer: ReturnType<typeof setInterval> | undefined;
+
+/** Poll briefly for the pixel, then give up rather than spin forever. */
+function flushWhenReady() {
+  if (typeof window === "undefined" || flushTimer) return;
+
+  let attempts = 0;
+  flushTimer = setInterval(() => {
+    attempts += 1;
+
+    if (window.fbq) {
+      log(`pixel ready after ${attempts * 250}ms, flushing ${pending.length}`);
+      clearInterval(flushTimer);
+      flushTimer = undefined;
+      const queued = pending.splice(0, pending.length);
+      for (const item of queued) send(item.event, item.params);
+      return;
+    }
+
+    // 20 × 250ms = five seconds. Past that the pixel is blocked or absent
+    // rather than slow, and holding events for a customer who will never
+    // be tracked is pointless.
+    if (attempts >= 20) {
+      clearInterval(flushTimer);
+      flushTimer = undefined;
+      log(`pixel never appeared; dropping ${pending.length} queued event(s)`, pending.map((p) => p.event));
+      pending.length = 0;
+    }
+  }, 250);
+}
+
+function send(event: string, params?: Record<string, unknown>) {
+  try {
+    window.fbq?.("track", event, params);
+    log("sent", event, params ?? {});
+  } catch (error) {
+    // Still swallowed — analytics must never interrupt a purchase — but no
+    // longer invisible. A tracking script is third-party code that can
+    // throw for reasons we never see, and the old version left no trace.
+    log("FAILED", event, error);
+  }
+}
+
+/**
+ * Fire a standard Meta event.
+ *
+ * Never throws, by design: every call site is a commercial moment, and a
+ * tracker must not be able to break an add to cart. But "never throws" used
+ * to mean "never says anything either", which made a missing event
+ * impossible to diagnose. Now failures are swallowed and logged.
  */
 export function trackMeta(event: string, params?: Record<string, unknown>) {
-  if (typeof window === "undefined" || !window.fbq) return;
-  try {
-    window.fbq("track", event, params);
-  } catch {
-    // Deliberately silent. Analytics must never interrupt a purchase.
+  if (typeof window === "undefined") return;
+
+  if (!metaPixelEnabled) {
+    log("skipped — pixel disabled in analytics.ts", event);
+    return;
   }
+
+  if (!window.fbq) {
+    log("queued — fbq not loaded yet", event);
+    pending.push({ event, params });
+    flushWhenReady();
+    return;
+  }
+
+  send(event, params);
 }
