@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { pad2 } from "@/lib/shopify/format";
 import { getAllCollections, getProductsByCollection } from "@/lib/shopify/catalog";
+import { collectionIsListed } from "@/lib/site/categories";
 
 /**
  * Collections, as an index rather than a grid.
@@ -17,7 +18,9 @@ import { getAllCollections, getProductsByCollection } from "@/lib/shopify/catalo
  * put in front of a thumb.
  */
 export default async function CollectionIndex() {
-  const all = await getAllCollections();
+  const all = (await getAllCollections()).filter((c) =>
+    collectionIsListed(c.handle),
+  );
   const collections = await Promise.all(
     all.map(async (collection) => {
       const products = await getProductsByCollection(collection.handle);
@@ -75,8 +78,19 @@ export default async function CollectionIndex() {
               </span>
             </span>
 
+            {/*
+              Empty is not sold out — the same distinction the collection
+              page makes, and it has to be made in both places or the index
+              contradicts the page it links to. A collection's status is
+              derived from its members, so one that has never held anything
+              comes back closed and would be labelled "Out of Stock": a
+              confident claim about stock where the truth is that the
+              collection has not been filled in yet.
+            */}
             <span className="eos-meta-sm shrink-0 text-right">
-              {collection.status === "OPEN" ? (
+              {collection.lots === 0 ? (
+                <span className="text-taupe">Coming Soon</span>
+              ) : collection.status === "OPEN" ? (
                 <span className="text-bone">Available</span>
               ) : (
                 <span className="flex items-center justify-end gap-2 text-taupe">
