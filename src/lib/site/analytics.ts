@@ -47,18 +47,55 @@ declare global {
  * or failed, and why. This exists because the previous version failed
  * silently in all three cases, which is indistinguishable from not being
  * called at all.
+ *
+ * THE FLAG IS STICKY, AND HAS TO BE. The previous version read the query
+ * string at the moment of logging, which looks equivalent and is not: this
+ * is a single-page app, so clicking from the page you opened with
+ * ?pixeldebug=1 to the product you want to test replaces the URL and takes
+ * the query with it. By the time Add to Cart runs there is no flag left to
+ * find, so the event fires correctly and prints nothing — which reads
+ * exactly like tracking being broken, and sent us looking for a bug in the
+ * wrong place.
+ *
+ * Seeing the query once therefore writes the flag down, and it stays on
+ * until switched off:
+ *
+ *   delete localStorage.eosPixelDebug
  */
 function debugging(): boolean {
   if (typeof window === "undefined") return false;
   try {
-    return (
-      new URLSearchParams(window.location.search).has("pixeldebug") ||
-      window.localStorage.getItem("eosPixelDebug") === "1"
-    );
+    if (new URLSearchParams(window.location.search).has("pixeldebug")) {
+      window.localStorage.setItem("eosPixelDebug", "1");
+      return true;
+    }
+    return window.localStorage.getItem("eosPixelDebug") === "1";
   } catch {
-    return false;
+    // Private mode and blocked storage both throw here. Honour the query
+    // string anyway rather than losing the session's diagnostics with it.
+    try {
+      return new URLSearchParams(window.location.search).has("pixeldebug");
+    } catch {
+      return false;
+    }
   }
 }
+
+/*
+  Read the flag as soon as this module reaches the browser, rather than
+  waiting for the first event.
+
+  Nothing calls `trackMeta` on page load — the two call sites are Add to
+  Cart and Checkout — so a lazy check would never see the query string of
+  the page the flag was typed on. The visitor would open
+  /products/x?pixeldebug=1, navigate once, and arrive at the button with
+  the flag still unread and now unreadable.
+
+  Evaluating here catches it while the URL is still the one that carried
+  it. The call is also what writes it to storage, so the side effect is
+  the point rather than an accident of ordering.
+*/
+if (typeof window !== "undefined") debugging();
 
 function log(...args: unknown[]) {
   if (debugging()) console.info("[eos pixel]", ...args);
