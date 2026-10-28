@@ -26,6 +26,55 @@ const SORT_LABELS: Record<SortKey, string> = {
   "price-desc": "Price — High to Low",
 };
 
+/**
+ * Which sizes the Size filter offers.
+ *
+ * The shop sells adult sizes (S, M, L...) and kids' age ranges (1-2 Years...),
+ * and showing both at once buries the adult sizes under ten rows of ages that
+ * mean nothing to most visitors. So the list follows what is being looked at:
+ * kids' sizes appear only when a kids collection is the active one, and
+ * everywhere else, including "All", the filter shows the adult sizes alone.
+ *
+ * A "kids collection" is the handle `kids` or anything starting `kids-`
+ * (kids-tops, kids-bottoms). If a kids collection is ever created under a
+ * different handle, add it here.
+ *
+ * The sizes come from the lots in view rather than from a fixed list, so a
+ * collection only offers sizes that exist in it.
+ */
+function isKidsHandle(handle: string): boolean {
+  return handle === "kids" || handle.startsWith("kids-");
+}
+
+function sizesFor(
+  collection: string,
+  products: Product[],
+  allSizes: string[],
+): string[] {
+  const kidsView = collection !== "all" && isKidsHandle(collection);
+
+  const inView = products.filter((p) => {
+    const inCollection =
+      collection === "all" || p.collectionHandles.includes(collection);
+    const isKidsLot = p.collectionHandles.some(isKidsHandle);
+    // Kids lots only contribute sizes when a kids collection is being viewed.
+    return inCollection && (kidsView || !isKidsLot);
+  });
+
+  const present = new Set<string>();
+  inView.forEach((p) =>
+    p.variants.forEach((v) =>
+      v.selectedOptions
+        .filter((o) => o.name === "Size")
+        .forEach((o) => present.add(o.value)),
+    ),
+  );
+
+  // Filtering the full list, not returning the set, keeps the order the
+  // catalog gave the sizes in.
+  return allSizes.filter((size) => present.has(size));
+}
+
 export default function ManifestBrowser({
   products,
   collections,
@@ -38,6 +87,22 @@ export default function ManifestBrowser({
   const [activeCollection, setActiveCollection] = useState("all");
   const [activeSizes, setActiveSizes] = useState<string[]>([]);
   const [sort, setSort] = useState<SortKey>("manifest");
+
+  // Sizes on offer for whatever is being viewed. See sizesFor.
+  const visibleSizes = useMemo(
+    () => sizesFor(activeCollection, products, sizes),
+    [activeCollection, products, sizes],
+  );
+
+  // Changing collection can take sizes off the menu. A size picked in Kids
+  // must not stay switched on, invisibly, once the kids sizes are hidden: the
+  // grid would filter by a choice the visitor can no longer see or undo.
+  // Sizes that exist in both views, such as S, stay selected.
+  function selectCollection(value: string) {
+    const stillOffered = sizesFor(value, products, sizes);
+    setActiveCollection(value);
+    setActiveSizes((prev) => prev.filter((s) => stillOffered.includes(s)));
+  }
 
   function toggleSize(size: string) {
     setActiveSizes((prev) =>
@@ -102,16 +167,18 @@ export default function ManifestBrowser({
               ...collections.map((c) => ({ value: c.handle, label: c.title })),
             ]}
             isActive={(value) => activeCollection === value}
-            onSelect={setActiveCollection}
+            onSelect={selectCollection}
             isGold={(value) => value === "exclusive"}
           />
 
-          <Filter
-            label="Size"
-            options={sizes.map((s) => ({ value: s, label: s }))}
-            isActive={(value) => activeSizes.includes(value)}
-            onSelect={toggleSize}
-          />
+          {visibleSizes.length > 0 && (
+            <Filter
+              label="Size"
+              options={visibleSizes.map((s) => ({ value: s, label: s }))}
+              isActive={(value) => activeSizes.includes(value)}
+              onSelect={toggleSize}
+            />
+          )}
         </div>
 
         <Filter
